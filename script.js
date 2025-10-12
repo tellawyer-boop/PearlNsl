@@ -489,4 +489,8 @@ answerInput.addEventListener('keypress', (e) => {
         addKnowledge();
         e.preventDefault();
     }
+
 });
+function sanitizeInput(input) {
+    return input.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '');
+}
