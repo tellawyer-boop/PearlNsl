@@ -299,6 +299,77 @@
             }
         }
 
+        /* Мэдлэг харах цонхны стиллүүд */
+        .knowledge-list {
+            max-height: 300px;
+            overflow-y: auto;
+            margin: 15px 0;
+            border: 1px solid #4a5568;
+            border-radius: 8px;
+            padding: 10px;
+            background: #2d3748;
+        }
+
+        .knowledge-item {
+            padding: 10px;
+            margin-bottom: 8px;
+            background: #1e293b;
+            border-radius: 6px;
+            border-left: 3px solid #74c7ec;
+        }
+
+        .knowledge-question {
+            font-weight: bold;
+            color: #74c7ec;
+            margin-bottom: 5px;
+        }
+
+        .knowledge-answer {
+            color: #e2e8f0;
+            font-size: 0.9rem;
+        }
+
+        .knowledge-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 5px;
+            margin-top: 8px;
+        }
+
+        .knowledge-edit-btn, .knowledge-delete-btn {
+            padding: 4px 8px;
+            border: none;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .knowledge-edit-btn {
+            background: #74c7ec;
+            color: #0f172a;
+        }
+
+        .knowledge-edit-btn:hover {
+            background: #90cdf4;
+        }
+
+        .knowledge-delete-btn {
+            background: #f87171;
+            color: white;
+        }
+
+        .knowledge-delete-btn:hover {
+            background: #ef4444;
+        }
+
+        .empty-knowledge {
+            text-align: center;
+            color: #a3b3cc;
+            font-style: italic;
+            padding: 20px;
+        }
+
         /* Бусад стиллүүд өмнөх шигээ хадгалагдсан */
         * {
             margin: 0;
@@ -742,6 +813,7 @@
                     <button class="quick-btn" data-command="юу хийж чадах вэ"> Юу хийж чадах вэ</button>
                     <button class="quick-btn" data-command="монгол үсэг">🇲🇳 Монгол үсэг</button>
                     <button class="quick-btn" id="addKnowledgeBtn">Мэдлэг нэмэх</button>
+                    <button class="quick-btn" id="viewKnowledgeBtn">Мэдлэг харах</button>
                     <button class="quick-btn" id="clearChatBtn"> Цэвэрлэх</button>
                     <button class="quick-btn" data-command="тусламж">Тусламж</button>
                 </div>
@@ -763,6 +835,20 @@
                 <textarea id="answerInput" placeholder="Жишээ: Сайн уу! Тавтай морил!" rows="4"></textarea>
             </div>
             <button id="saveKnowledgeBtn"> Хадгалах</button>
+        </div>
+    </div>
+
+    <!-- Мэдлэг харах цонх -->
+    <div id="viewKnowledgeModal" class="modal">
+        <div class="modal-content" style="max-width: 600px;">
+            <span class="close">&times;</span>
+            <h2>📚 Мэдлэгийн сан</h2>
+            <div class="knowledge-list" id="knowledgeList">
+                <!-- Энд мэдлэгийн жагсаалт харуулагдана -->
+            </div>
+            <div style="text-align: center; margin-top: 15px;">
+                <button id="closeKnowledgeModalBtn" class="knowledge-edit-btn">Хаах</button>
+            </div>
         </div>
     </div>
 
@@ -809,14 +895,18 @@
         const knowledgeCountElement = document.getElementById('knowledgeCount');
         const userCountElement = document.getElementById('userCount');
         const addKnowledgeBtn = document.getElementById('addKnowledgeBtn');
+        const viewKnowledgeBtn = document.getElementById('viewKnowledgeBtn');
         const clearChatBtn = document.getElementById('clearChatBtn');
         const knowledgeModal = document.getElementById('knowledgeModal');
-        const closeModal = document.querySelector('.close');
+        const viewKnowledgeModal = document.getElementById('viewKnowledgeModal');
+        const closeModal = document.querySelectorAll('.close');
         const saveKnowledgeBtn = document.getElementById('saveKnowledgeBtn');
         const questionInput = document.getElementById('questionInput');
         const answerInput = document.getElementById('answerInput');
         const apiKeyInput = document.getElementById('apiKeyInput');
         const saveApiKey = document.getElementById('saveApiKey');
+        const knowledgeList = document.getElementById('knowledgeList');
+        const closeKnowledgeModalBtn = document.getElementById('closeKnowledgeModalBtn');
 
         // Auto-growing textarea функц
         function autoGrowTextarea(textarea) {
@@ -1231,12 +1321,125 @@
             }
         }
 
+        // Мэдлэг харах функц
+        function viewKnowledge() {
+            // Мэдлэгийн жагсаалтыг цэвэрлэх
+            knowledgeList.innerHTML = '';
+            
+            // Мэдлэг байхгүй бол мэдэгдэл харуулах
+            if (Object.keys(knowledgeBase).length === 0) {
+                knowledgeList.innerHTML = '<div class="empty-knowledge">Мэдлэгийн сан хоосон байна</div>';
+                viewKnowledgeModal.style.display = 'block';
+                return;
+            }
+            
+            // Мэдлэгүүдийг харуулах
+            Object.keys(knowledgeBase).forEach(question => {
+                const knowledgeItem = document.createElement('div');
+                knowledgeItem.className = 'knowledge-item';
+                knowledgeItem.innerHTML = `
+                    <div class="knowledge-question">${question}</div>
+                    <div class="knowledge-answer">${knowledgeBase[question]}</div>
+                    <div class="knowledge-actions">
+                        <button class="knowledge-edit-btn" data-question="${question}">Засах</button>
+                        <button class="knowledge-delete-btn" data-question="${question}">Устгах</button>
+                    </div>
+                `;
+                knowledgeList.appendChild(knowledgeItem);
+            });
+            
+            // Засах, устгах товчлууруудад event listener нэмэх
+            document.querySelectorAll('.knowledge-edit-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const question = this.getAttribute('data-question');
+                    editKnowledge(question);
+                });
+            });
+            
+            document.querySelectorAll('.knowledge-delete-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const question = this.getAttribute('data-question');
+                    deleteKnowledge(question);
+                });
+            });
+            
+            // Модаль цонхыг харуулах
+            viewKnowledgeModal.style.display = 'block';
+        }
+
+        // Мэдлэг засах функц
+        function editKnowledge(question) {
+            // Мэдлэг нэмэх цонхыг нээх
+            knowledgeModal.style.display = 'block';
+            
+            // Талбаруудыг бөглөх
+            questionInput.value = question;
+            answerInput.value = knowledgeBase[question];
+            
+            // Мэдлэг харах цонхыг хаах
+            viewKnowledgeModal.style.display = 'none';
+            
+            // Хадгалах товчлуурын үйлдлийг өөрчлөх
+            saveKnowledgeBtn.onclick = function() {
+                const newQuestion = questionInput.value.trim();
+                const newAnswer = answerInput.value.trim();
+                
+                if (newQuestion && newAnswer) {
+                    // Хуучин мэдлэгийг устгах
+                    delete knowledgeBase[question];
+                    
+                    // Шинэ мэдлэг нэмэх
+                    knowledgeBase[newQuestion.toLowerCase()] = newAnswer;
+                    
+                    // LocalStorage-д хадгалах
+                    localStorage.setItem('knowledgeBase', JSON.stringify(knowledgeBase));
+                    
+                    // Статистик шинэчлэх
+                    updateStats();
+                    
+                    // Модаль цонх хаах
+                    knowledgeModal.style.display = 'none';
+                    questionInput.value = '';
+                    answerInput.value = '';
+                    
+                    // Амжилттай зассан мэдээлэл өгөх
+                    addSystemMessage("✅ Мэдлэг амжилттай засагдлаа! 🎉");
+                    
+                    // Хадгалах товчлуурын үйлдлийг буцаах
+                    saveKnowledgeBtn.onclick = addKnowledge;
+                } else {
+                    alert('Асуулт болон хариултыг бөглөнө үү!');
+                }
+            };
+        }
+
+        // Мэдлэг устгах функц
+        function deleteKnowledge(question) {
+            if (confirm(`"${question}" мэдлэгийг устгахдаа итгэлтэй байна уу?`)) {
+                // Мэдлэгийг устгах
+                delete knowledgeBase[question];
+                knowledgeCount--;
+                
+                // LocalStorage-д хадгалах
+                localStorage.setItem('knowledgeBase', JSON.stringify(knowledgeBase));
+                
+                // Статистик шинэчлэх
+                updateStats();
+                
+                // Мэдлэгийн жагсаалтыг дахин харуулах
+                viewKnowledge();
+                
+                // Устгасан мэдээлэл өгөх
+                addSystemMessage("🗑️ Мэдлэг амжилттай устгагдлаа");
+            }
+        }
+
         // Үйлдэлд event listener үүсгэх
         sendButton.addEventListener('click', sendMessage);
 
         // Хурдан товчлуурууд
         document.querySelectorAll('.quick-btn').forEach(button => {
-            if (button.id !== 'addKnowledgeBtn' && button.id !== 'clearChatBtn') {
+            if (button.id !== 'addKnowledgeBtn' && button.id !== 'viewKnowledgeBtn' && button.id !== 'clearChatBtn') {
                 button.addEventListener('click', () => {
                     messageInput.value = button.getAttribute('data-command');
                     sendMessage();
@@ -1250,6 +1453,9 @@
             questionInput.focus();
         });
 
+        // Мэдлэг харах товчлуур
+        viewKnowledgeBtn.addEventListener('click', viewKnowledge);
+
         // Чат цэвэрлэх товчлуур
         clearChatBtn.addEventListener('click', () => {
             clearChat();
@@ -1257,19 +1463,31 @@
         });
 
         // Модаль хаах
-        closeModal.addEventListener('click', () => {
-            knowledgeModal.style.display = 'none';
+        closeModal.forEach(closeBtn => {
+            closeBtn.addEventListener('click', function() {
+                this.closest('.modal').style.display = 'none';
+            });
         });
 
         // Модаль гадна дээр дархад хаах
         window.addEventListener('click', (e) => {
             if (e.target === knowledgeModal) {
                 knowledgeModal.style.display = 'none';
+                // Хадгалах товчлуурын үйлдлийг буцаах
+                saveKnowledgeBtn.onclick = addKnowledge;
+            }
+            if (e.target === viewKnowledgeModal) {
+                viewKnowledgeModal.style.display = 'none';
             }
         });
 
         // Мэдлэг нэмэх хадгалах товчлуур
         saveKnowledgeBtn.addEventListener('click', addKnowledge);
+
+        // Мэдлэг харах цонх хаах товчлуур
+        closeKnowledgeModalBtn.addEventListener('click', () => {
+            viewKnowledgeModal.style.display = 'none';
+        });
 
         // Enter дарж модал дотор хадгалах
         questionInput.addEventListener('keypress', (e) => {
@@ -1287,10 +1505,4 @@
         });
     </script>
 </body>
-
 </html>
-<meta http-equiv="Content-Security-Policy" 
-      content="default-src 'self'; 
-               script-src 'self' https://api.openai.com; 
-               style-src 'self' 'unsafe-inline'">
-
