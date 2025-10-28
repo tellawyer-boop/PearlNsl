@@ -7,7 +7,364 @@
     <meta name="description" content="Монгол хэл дэмжих AI туслах. Үнэгүй чатбот сервис. OpenAI технологиор ажилладаг.">
     <meta name="keywords" content="ai, монгол, чатбот, openai, үнэгүй, бот">
     <style>
-        /* Auto-growing textarea стиллүүд */
+        /* Үндсэн стиллүүд */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-purple: #8b5cf6;
+            --primary-pink: #ec4899;
+            --primary-blue: #74c7ec;
+            --dark-bg: #0f0f23;
+            --darker-bg: #0a0a1a;
+            --surface-dark: #1a1a2e;
+            --surface-light: #2d2b55;
+            --text-primary: #e2e8f0;
+            --text-secondary: #a3b3cc;
+            --text-muted: #718096;
+            --success-color: #48bb78;
+            --warning-color: #ed8936;
+            --error-color: #f56565;
+            --info-color: #4299e1;
+            
+            --border-radius: 16px;
+            --border-radius-sm: 12px;
+            --shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            --shadow-lg: 0 15px 50px rgba(0, 0, 0, 0.4);
+            
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--dark-bg);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Анимирован background */
+        .animated-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+        }
+
+        .bg-gradient {
+            position: absolute;
+            width: 200%;
+            height: 200%;
+            background: 
+                radial-gradient(circle at 20% 80%, rgba(139, 92, 246, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(236, 72, 153, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 40% 40%, rgba(116, 199, 236, 0.08) 0%, transparent 50%);
+            animation: float 20s ease-in-out infinite;
+        }
+
+        .bg-particles {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+        }
+
+        .particle {
+            position: absolute;
+            background: rgba(139, 92, 246, 0.3);
+            border-radius: 50%;
+            animation: float 15s infinite linear;
+        }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translate(0, 0) rotate(0deg);
+            }
+            25% {
+                transform: translate(10px, 10px) rotate(90deg);
+            }
+            50% {
+                transform: translate(0, 20px) rotate(180deg);
+            }
+            75% {
+                transform: translate(-10px, 10px) rotate(270deg);
+            }
+        }
+
+        /* Glass morphism эффект */
+        .glass {
+            background: rgba(26, 26, 46, 0.7);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: var(--shadow);
+        }
+
+        .glass-light {
+            background: rgba(45, 43, 85, 0.6);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        /* Контейнер ба layout */
+        .container {
+            width: 100%;
+            max-width: 1400px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            padding: 20px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Header стиллүүд */
+        header {
+            padding: 20px 30px;
+            border-radius: var(--border-radius);
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--primary-purple), var(--primary-pink), transparent);
+            animation: shimmer 3s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 10px;
+        }
+
+        .logo {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, var(--primary-purple), var(--primary-pink));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .brand-text h1 {
+            font-size: 2.5rem;
+            background: linear-gradient(135deg, var(--primary-purple), var(--primary-pink));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+
+        .brand-text p {
+            color: var(--text-secondary);
+            font-size: 1rem;
+            margin-top: 5px;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        #userDisplayName {
+            color: var(--primary-blue);
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        .logout-btn {
+            padding: 8px 16px;
+            background: rgba(239, 68, 68, 0.2);
+            color: #ef4444;
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            border-radius: var(--border-radius-sm);
+            cursor: pointer;
+            transition: var(--transition);
+            font-size: 0.9rem;
+        }
+
+        .logout-btn:hover {
+            background: rgba(239, 68, 68, 0.3);
+            transform: translateY(-2px);
+        }
+
+        /* Гол контент */
+        main {
+            display: flex;
+            gap: 25px;
+            flex: 1;
+            min-height: 600px;
+        }
+
+        /* Чат контейнер */
+        .chat-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            position: relative;
+        }
+
+        .chat-header {
+            padding: 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .chat-header h3 {
+            color: var(--text-primary);
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .status-indicator {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--success-color);
+            animation: pulse 2s infinite;
+        }
+
+        .chat-controls {
+            display: flex;
+            gap: 10px;
+        }
+
+        .theme-btn, .export-btn {
+            padding: 8px 16px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: var(--border-radius-sm);
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: var(--transition);
+            font-size: 0.9rem;
+        }
+
+        .theme-btn:hover, .export-btn:hover {
+            background: rgba(255, 255, 255, 0.15);
+            color: var(--primary-blue);
+        }
+
+        .chat-messages {
+            flex: 1;
+            padding: 25px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            max-height: calc(100vh - 300px);
+        }
+
+        /* Мессеж стиллүүд */
+        .message {
+            max-width: 75%;
+            padding: 18px 22px;
+            border-radius: var(--border-radius);
+            line-height: 1.6;
+            animation: slideInUp 0.4s ease;
+            position: relative;
+            word-wrap: break-word;
+        }
+
+        @keyframes slideInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .user-message {
+            align-self: flex-end;
+            background: linear-gradient(135deg, var(--primary-purple), var(--primary-pink));
+            color: white;
+            border-bottom-right-radius: 8px;
+            box-shadow: 0 4px 20px rgba(139, 92, 246, 0.3);
+        }
+
+        .bot-message {
+            align-self: flex-start;
+            background: var(--surface-light);
+            color: var(--text-primary);
+            border-bottom-left-radius: 8px;
+            border-left: 3px solid var(--primary-blue);
+        }
+
+        .system-message {
+            align-self: center;
+            background: rgba(66, 153, 225, 0.1);
+            color: var(--info-color);
+            border: 1px solid rgba(66, 153, 225, 0.2);
+            max-width: 85%;
+            text-align: center;
+            padding: 15px 25px;
+        }
+
+        .message-content {
+            line-height: 1.6;
+            font-size: 1rem;
+        }
+
+        .message-info {
+            font-size: 0.75rem;
+            margin-top: 10px;
+            opacity: 0.7;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        /* Оролтын хэсэг */
+        .input-container {
+            padding: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            gap: 15px;
+            align-items: flex-end;
+        }
+
         .textarea-wrapper {
             flex: 1;
             position: relative;
@@ -15,250 +372,521 @@
 
         #messageInput {
             width: 100%;
-            min-height: 40px;
+            min-height: 50px;
             max-height: 120px;
-            padding: 10px 12px;
-            border: none;
-            border-radius: 20px;
-            background: #2d3748;
-            color: #e2e8f0;
-            font-size: 0.9rem;
+            padding: 15px 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: var(--border-radius);
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-primary);
+            font-size: 1rem;
             outline: none;
             resize: none;
             overflow-y: auto;
             font-family: inherit;
-            line-height: 1.4;
-            transition: all 0.2s;
+            line-height: 1.5;
+            transition: var(--transition);
         }
 
         #messageInput:focus {
-            box-shadow: 0 0 0 2px #74c7ec;
+            border-color: var(--primary-purple);
+            box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.2);
         }
 
-        /* Textarea scrollbar стиль */
-        #messageInput::-webkit-scrollbar {
-            width: 4px;
+        #messageInput::placeholder {
+            color: var(--text-muted);
         }
 
-        #messageInput::-webkit-scrollbar-track {
-            background: transparent;
-            border-radius: 2px;
-        }
-
-        #messageInput::-webkit-scrollbar-thumb {
-            background: #74c7ec;
-            border-radius: 2px;
-        }
-
-        #messageInput::-webkit-scrollbar-thumb:hover {
-            background: #90cdf4;
-        }
-
-        /* Input container өөрчлөлт */
-        .input-container {
+        .input-actions {
             display: flex;
-            padding: 12px;
-            background: rgba(30, 41, 59, 0.9);
+            gap: 10px;
+        }
+
+        .send-btn {
+            padding: 15px 25px;
+            background: linear-gradient(135deg, var(--primary-purple), var(--primary-pink));
+            color: white;
+            border: none;
+            border-radius: var(--border-radius);
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
             gap: 8px;
-            align-items: flex-end;
+            white-space: nowrap;
+            box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3);
         }
 
-        /* Нэвтрэлт цонхны стиллүүд */
-        .login-content {
-            max-width: 400px;
-            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
-            border-radius: 12px;
-            padding: 30px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        .send-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(139, 92, 246, 0.4);
         }
 
-        .login-header {
-            text-align: center;
-            margin-bottom: 25px;
+        .stop-button {
+            padding: 15px 25px;
+            background: var(--error-color);
+            color: white;
+            border: none;
+            border-radius: var(--border-radius);
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            white-space: nowrap;
         }
 
-        .login-header h2 {
-            color: #74c7ec;
-            margin-bottom: 8px;
-            font-size: 1.8rem;
+        .stop-button:hover {
+            background: #e53e3e;
+            transform: translateY(-2px);
         }
 
-        .login-header p {
-            color: #a3b3cc;
-            font-size: 0.9rem;
+        /* Хажуу талын самбар */
+        .sidebar {
+            width: 350px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
         }
 
-        .login-form {
+        .stats-box, .api-config, .quick-actions, .learning-materials {
+            border-radius: var(--border-radius);
+            padding: 25px;
+        }
+
+        .stats-header, .actions-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .stats-header h3, .actions-header h3, .api-config h3, .learning-materials h3 {
+            color: var(--text-primary);
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .refresh-btn {
+            padding: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            border-radius: 8px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .refresh-btn:hover {
+            background: rgba(255, 255, 255, 0.15);
+            color: var(--primary-blue);
+        }
+
+        .stats-content {
             display: flex;
             flex-direction: column;
             gap: 15px;
         }
 
-        .login-form .form-group label {
-            color: #e2e8f0;
-            font-size: 0.9rem;
-            margin-bottom: 5px;
-            display: block;
+        .stat-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         }
 
-        .login-form .form-group input {
+        .stat-item:last-child {
+            border-bottom: none;
+        }
+
+        .stat-label {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .stat-value {
+            color: var(--text-primary);
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        /* API тохиргоо */
+        .api-form {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        #apiKeyInput {
+            flex: 1;
+            padding: 12px 16px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: var(--border-radius-sm);
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-primary);
+            font-size: 0.9rem;
+        }
+
+        .save-btn {
+            padding: 12px 20px;
+            background: var(--primary-blue);
+            color: var(--dark-bg);
+            border: none;
+            border-radius: var(--border-radius-sm);
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-weight: 600;
+        }
+
+        .save-btn:hover {
+            background: #63b3e3;
+            transform: translateY(-2px);
+        }
+
+        .api-info {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            line-height: 1.5;
+        }
+
+        .api-info a {
+            color: var(--primary-blue);
+            text-decoration: none;
+        }
+
+        .api-info a:hover {
+            text-decoration: underline;
+        }
+
+        /* Хурдан товчлуурууд */
+        .action-badges {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+
+        .badge {
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 600;
+        }
+
+        .badge.new {
+            background: var(--error-color);
+            color: white;
+        }
+
+        .quick-buttons-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .quick-btn {
+            padding: 15px;
+            border: none;
+            border-radius: var(--border-radius-sm);
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.9rem;
+            text-align: left;
+            background: rgba(255, 255, 255, 0.08);
+            color: var(--text-primary);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .quick-btn:hover {
+            background: rgba(255, 255, 255, 0.12);
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Модаль цонхнууд */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
             width: 100%;
-            padding: 12px;
-            border: 1px solid #4a5568;
-            border-radius: 8px;
-            background: #2d3748;
-            color: #e2e8f0;
-            font-size: 0.9rem;
-            transition: border-color 0.3s;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            animation: fadeIn 0.3s ease;
         }
 
-        .login-form .form-group input:focus {
-            border-color: #74c7ec;
+        .modal.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .modal-content {
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-lg);
+            animation: slideIn 0.3s ease;
+            max-height: 90vh;
+            overflow-y: auto;
+            width: 90%;
+            max-width: 500px;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 25px 30px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .modal-header h2 {
+            color: var(--text-primary);
+            font-size: 1.4rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .close {
+            color: var(--text-secondary);
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: var(--transition);
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+        }
+
+        .close:hover {
+            color: var(--text-primary);
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .modal-body {
+            padding: 30px;
+        }
+
+        .modal-footer {
+            padding: 20px 30px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            gap: 15px;
+            justify-content: flex-end;
+        }
+
+        .cancel-btn {
+            padding: 12px 24px;
+            background: transparent;
+            color: var(--text-secondary);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: var(--border-radius-sm);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .cancel-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text-primary);
+        }
+
+        /* Нэвтрэлт цонхны стиллүүд */
+        .login-content {
+            max-width: 450px;
+            border-radius: var(--border-radius);
+            padding: 40px;
+        }
+
+        .login-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .login-logo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .login-logo .logo {
+            width: 60px;
+            height: 60px;
+            font-size: 1.8rem;
+        }
+
+        .login-header h2 {
+            color: var(--text-primary);
+            font-size: 2rem;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, var(--primary-purple), var(--primary-pink));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .login-header p {
+            color: var(--text-secondary);
+            font-size: 1rem;
+        }
+
+        .login-form {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .form-group label {
+            color: var(--text-primary);
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            padding: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: var(--border-radius-sm);
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-primary);
+            font-size: 1rem;
+            transition: var(--transition);
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
             outline: none;
-            box-shadow: 0 0 0 2px rgba(116, 199, 236, 0.2);
+            border-color: var(--primary-purple);
+            box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.2);
         }
 
         .login-actions {
             display: flex;
-            gap: 10px;
+            gap: 15px;
             margin-top: 10px;
         }
 
         .login-btn, .register-btn {
             flex: 1;
-            padding: 12px;
+            padding: 15px;
             border: none;
-            border-radius: 8px;
-            font-weight: bold;
+            border-radius: var(--border-radius-sm);
+            font-weight: 600;
             cursor: pointer;
-            transition: all 0.3s;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            font-size: 1rem;
         }
 
         .login-btn {
-            background: #74c7ec;
-            color: #0f172a;
+            background: linear-gradient(135deg, var(--primary-purple), var(--primary-pink));
+            color: white;
         }
 
         .login-btn:hover {
-            background: #90cdf4;
             transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(139, 92, 246, 0.3);
         }
 
         .register-btn {
-            background: #4a5568;
-            color: #e2e8f0;
+            background: transparent;
+            color: var(--primary-blue);
+            border: 1px solid rgba(116, 199, 236, 0.3);
         }
 
         .register-btn:hover {
-            background: #5a6578;
+            background: rgba(116, 199, 236, 0.1);
             transform: translateY(-2px);
         }
 
         .login-footer {
-            margin-top: 15px;
+            margin-top: 25px;
             text-align: center;
-            font-size: 0.8rem;
-            color: #a3b3cc;
         }
 
-        .login-footer a {
-            color: #74c7ec;
+        .divider {
+            display: flex;
+            align-items: center;
+            text-align: center;
+            margin: 25px 0;
+            color: var(--text-muted);
+        }
+
+        .divider::before,
+        .divider::after {
+            content: '';
+            flex: 1;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .divider span {
+            padding: 0 20px;
+            font-size: 0.9rem;
+        }
+
+        .forgot-link {
+            color: var(--primary-blue);
             text-decoration: none;
+            font-size: 0.9rem;
         }
 
-        .login-footer a:hover {
+        .forgot-link:hover {
             text-decoration: underline;
         }
 
-        /* Хэрэглэгчийн мэдээлэл */
-        .user-info {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-top: 10px;
-        }
-
-        #userDisplayName {
-            color: #74c7ec;
-            font-weight: bold;
-        }
-
-        .logout-btn {
-            padding: 5px 10px;
-            background: #4a5568;
-            color: #e2e8f0;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 0.8rem;
-            transition: background 0.3s;
-        }
-
-        .logout-btn:hover {
-            background: #5a6578;
-        }
-
-        /* Зогсоох товчны стиль */
-        .stop-button {
-            padding: 10px 16px;
-            border: none;
-            border-radius: 20px;
-            background: #f87171;
-            color: white;
-            font-weight: bold;
-            cursor: pointer;
-            transition: background 0.2s;
-            margin-left: 8px;
-        }
-
-        .stop-button:hover {
-            background: #ef4444;
-        }
-
-        /* Систем мессежийн стиль */
-        .system-message {
-            align-self: center;
-            background: rgba(55, 65, 81, 0.5);
-            color: #9ca3af;
-            border-radius: 15px;
-            text-align: center;
-            max-width: 60%;
-            margin: 5px auto;
-            padding: 10px 15px;
-        }
-
-        .system-message .message-info {
-            text-align: center;
-        }
-
-        /* Typewriter эффект */
-        .streaming-message {
-            position: relative;
-        }
-
-        .streaming-message::after {
-            content: '|';
-            animation: blink 1s infinite;
-            color: #74c7ec;
-            font-weight: bold;
-        }
-
-        @keyframes blink {
-            0%, 50% { opacity: 1; }
-            51%, 100% { opacity: 0; }
-        }
-
-        /* Бодож байгаа индикаторын стиллүүд */
+        /* Бодож байгаа индикатор */
         .thinking-indicator {
             display: flex;
             align-items: center;
-            gap: 10px;
-            padding: 10px 15px;
-            background: #313244;
-            border-radius: 15px;
+            gap: 15px;
+            padding: 15px 20px;
+            background: var(--surface-light);
+            border-radius: var(--border-radius);
             align-self: flex-start;
-            margin-bottom: 10px;
-            color: #a3b3cc;
+            margin-bottom: 15px;
+            color: var(--text-secondary);
             font-style: italic;
             animation: fadeIn 0.3s ease;
         }
@@ -269,14 +897,14 @@
 
         .thinking-dots {
             display: flex;
-            gap: 4px;
+            gap: 5px;
         }
 
         .thinking-dots span {
-            width: 6px;
-            height: 6px;
+            width: 8px;
+            height: 8px;
             border-radius: 50%;
-            background-color: #74c7ec;
+            background-color: var(--primary-blue);
             animation: thinkingBounce 1.5s infinite ease-in-out;
         }
 
@@ -301,380 +929,113 @@
 
         /* Мэдлэг харах цонхны стиллүүд */
         .knowledge-list {
-            max-height: 300px;
+            max-height: 400px;
             overflow-y: auto;
-            margin: 15px 0;
-            border: 1px solid #4a5568;
-            border-radius: 8px;
-            padding: 10px;
-            background: #2d3748;
+            margin: 20px 0;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: var(--border-radius-sm);
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.03);
         }
 
         .knowledge-item {
-            padding: 10px;
-            margin-bottom: 8px;
-            background: #1e293b;
-            border-radius: 6px;
-            border-left: 3px solid #74c7ec;
+            padding: 15px;
+            margin-bottom: 12px;
+            background: var(--surface-light);
+            border-radius: var(--border-radius-sm);
+            border-left: 4px solid var(--primary-purple);
+            transition: var(--transition);
+        }
+
+        .knowledge-item:hover {
+            transform: translateX(5px);
+            background: rgba(139, 92, 246, 0.1);
         }
 
         .knowledge-question {
-            font-weight: bold;
-            color: #74c7ec;
-            margin-bottom: 5px;
+            font-weight: 600;
+            color: var(--primary-blue);
+            margin-bottom: 8px;
+            font-size: 1rem;
         }
 
         .knowledge-answer {
-            color: #e2e8f0;
+            color: var(--text-primary);
             font-size: 0.9rem;
+            line-height: 1.5;
         }
 
         .knowledge-actions {
             display: flex;
             justify-content: flex-end;
-            gap: 5px;
-            margin-top: 8px;
+            gap: 8px;
+            margin-top: 12px;
         }
 
         .knowledge-edit-btn, .knowledge-delete-btn {
-            padding: 4px 8px;
+            padding: 6px 12px;
             border: none;
-            border-radius: 4px;
+            border-radius: 6px;
             font-size: 0.8rem;
             cursor: pointer;
-            transition: all 0.2s;
+            transition: var(--transition);
+            font-weight: 500;
         }
 
         .knowledge-edit-btn {
-            background: #74c7ec;
-            color: #0f172a;
+            background: var(--info-color);
+            color: white;
         }
 
         .knowledge-edit-btn:hover {
-            background: #90cdf4;
+            background: #3182ce;
+            transform: translateY(-2px);
         }
 
         .knowledge-delete-btn {
-            background: #f87171;
+            background: var(--error-color);
             color: white;
         }
 
         .knowledge-delete-btn:hover {
-            background: #ef4444;
+            background: #e53e3e;
+            transform: translateY(-2px);
         }
 
         .empty-knowledge {
             text-align: center;
-            color: #a3b3cc;
+            color: var(--text-muted);
             font-style: italic;
-            padding: 20px;
+            padding: 40px 20px;
         }
 
-        /* Бусад стиллүүд өмнөх шигээ хадгалагдсан */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+        /* Scrollbar стиллүүд */
+        ::-webkit-scrollbar {
+            width: 8px;
         }
 
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
-            color: #e2e8f0;
-            min-height: 100vh;
-            padding: 20px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
+        ::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 4px;
         }
 
-        .container {
-            width: 100%;
-            max-width: 1200px;
-            height: 90vh;
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
+        ::-webkit-scrollbar-thumb {
+            background: var(--primary-purple);
+            border-radius: 4px;
         }
 
-        header {
-            text-align: center;
-            padding: 15px;
-            background: rgba(30, 41, 59, 0.8);
-            border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-            position: relative;
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--primary-pink);
         }
 
-        header h1 {
-            font-size: 2rem;
-            margin-bottom: 5px;
-            color: #74c7ec;
-        }
-
-        header p {
-            font-size: 1rem;
-            color: #a3b3cc;
-        }
-
-        main {
-            display: flex;
-            gap: 20px;
-            height: 100%;
-        }
-
-        .chat-container {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            background: rgba(30, 41, 59, 0.8);
-            border-radius: 12px;
-            overflow: hidden;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-        }
-
-        .chat-messages {
-            flex: 1;
-            padding: 15px;
-            overflow-y: auto;
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            background: #1e293b;
-            max-height: calc(90vh - 200px);
-        }
-
-        /* Scrollbar стиль */
-        .chat-messages::-webkit-scrollbar {
-            width: 6px;
-        }
-
-        .chat-messages::-webkit-scrollbar-track {
-            background: #2d3748;
-            border-radius: 3px;
-        }
-
-        .chat-messages::-webkit-scrollbar-thumb {
-            background: #74c7ec;
-            border-radius: 3px;
-        }
-
-        .chat-messages::-webkit-scrollbar-thumb:hover {
-            background: #90cdf4;
-        }
-
-        .message {
-            max-width: 75%;
-            padding: 10px 15px;
-            border-radius: 15px;
-            line-height: 1.4;
-            animation: fadeIn 0.3s ease;
-            word-wrap: break-word;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(8px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .user-message {
-            align-self: flex-end;
-            background: #ebeeef;
-            color: #0f172a;
-            border-bottom-right-radius: 5px;
-        }
-
-        .bot-message {
-            align-self: flex-start;
-            background: #272840;
-            color: #cdd6f4;
-            border-bottom-left-radius: 5px;
-        }
-
-        .message-info {
-            font-size: 0.75rem;
-            margin-top: 4px;
-            opacity: 0.7;
-        }
-
-        #sendButton {
-            padding: 10px 16px;
-            border: none;
-            border-radius: 20px;
-            background: #74c7ec;
-            color: #0f172a;
-            font-weight: bold;
-            cursor: pointer;
-            transition: background 0.2s;
-            white-space: nowrap;
-        }
-
-        #sendButton:hover {
-            background: #90cdf4;
-        }
-
-        .sidebar {
-            width: 300px;
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
-
-        .stats-box, .api-config, .quick-actions {
-            background: rgba(30, 41, 59, 0.8);
-            border-radius: 12px;
-            padding: 15px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-        }
-
-        .stats-box h3, .api-config h3, .quick-actions h3 {
-            margin-bottom: 12px;
-            color: #74c7ec;
-            border-bottom: 1px solid #4a5568;
-            padding-bottom: 8px;
-            font-size: 1rem;
-        }
-
-        .stats-box p {
-            margin: 8px 0;
-            font-size: 0.9rem;
-        }
-
-        .api-config {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-
-        #apiKeyInput {
-            padding: 8px 12px;
-            border: none;
-            border-radius: 8px;
-            background: #2d3748;
-            color: #e2e8f0;
-            font-size: 0.9rem;
-        }
-
-        #saveApiKey {
-            padding: 8px;
-            border: none;
-            border-radius: 8px;
-            background: #74c7ec;
-            color: #0f172a;
-            font-weight: bold;
-            cursor: pointer;
-        }
-
-        #saveApiKey:hover {
-            background: #90cdf4;
-        }
-
-        .quick-actions {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-
-        .quick-btn {
-            padding: 8px 12px;
-            border: none;
-            border-radius: 8px;
-            background: #4a5568;
-            color: #e2e8f0;
-            text-align: left;
-            cursor: pointer;
-            transition: background 0.2s;
-            font-size: 0.9rem;
-        }
-
-        .quick-btn:hover {
-            background: #74c7ec;
-            color: #0f172a;
-        }
-
-        /* Модаль цонхны стиль */
-        .modal {
-            display: none;
-            position: fixed;
-            z-index: 100;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.7);
-            animation: fadeIn 0.3s ease;
-        }
-
-        .modal-content {
-            background: #1e293b;
-            margin: 10% auto;
-            padding: 20px;
-            border-radius: 12px;
-            width: 90%;
-            max-width: 450px;
-            box-shadow: 0 4px 25px rgba(0, 0, 0, 0.5);
-            position: relative;
-        }
-
-        .close {
-            color: #aaa;
-            float: right;
-            font-size: 24px;
-            font-weight: bold;
-            cursor: pointer;
-            position: absolute;
-            right: 15px;
-            top: 10px;
-        }
-
-        .close:hover {
-            color: #fff;
-        }
-
-        .form-group {
-            margin-bottom: 15px;
-        }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 6px;
-            color: #74c7ec;
-            font-size: 0.9rem;
-        }
-
-        .form-group input, .form-group textarea {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #4a5568;
-            border-radius: 6px;
-            background: #2d3748;
-            color: #e2e8f0;
-            font-size: 0.9rem;
-        }
-
-        #saveKnowledgeBtn {
-            width: 100%;
-            padding: 10px;
-            border: none;
-            border-radius: 6px;
-            background: #74c7ec;
-            color: #0f172a;
-            font-weight: bold;
-            cursor: pointer;
-            transition: background 0.2s;
-        }
-
-        #saveKnowledgeBtn:hover {
-            background: #90cdf4;
-        }
-
-        /* Жижиг дэлгэцүүдэд зориулсан хариуцлагатай дизайн */
-        @media (max-width: 900px) {
-            .container {
-                height: auto;
-                min-height: 100vh;
+        /* Хариуцлагатай дизайн */
+        @media (max-width: 1200px) {
+            .sidebar {
+                width: 320px;
             }
-            
+        }
+
+        @media (max-width: 992px) {
             main {
                 flex-direction: column;
                 height: auto;
@@ -686,13 +1047,53 @@
                 flex-wrap: wrap;
             }
             
-            .stats-box, .api-config, .quick-actions {
+            .stats-box, .api-config, .quick-actions, .learning-materials {
                 flex: 1;
-                min-width: 250px;
+                min-width: 300px;
             }
             
             .message {
                 max-width: 85%;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+                gap: 15px;
+            }
+            
+            .brand-text h1 {
+                font-size: 2rem;
+            }
+            
+            .chat-header {
+                padding: 15px;
+                flex-direction: column;
+                gap: 15px;
+                text-align: center;
+            }
+            
+            .input-container {
+                flex-direction: column;
+            }
+            
+            .input-actions {
+                width: 100%;
+                justify-content: stretch;
+            }
+            
+            .send-btn, .stop-button {
+                flex: 1;
+            }
+            
+            .quick-buttons-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .modal-content {
+                margin: 20px;
+                width: calc(100% - 40px);
             }
             
             .login-actions {
@@ -700,44 +1101,63 @@
             }
         }
 
-        @media (max-width: 600px) {
-            body {
+        @media (max-width: 480px) {
+            .container {
                 padding: 10px;
             }
             
-            .container {
+            .brand {
+                flex-direction: column;
                 gap: 10px;
             }
             
-            header h1 {
-                font-size: 1.5rem;
+            .brand-text h1 {
+                font-size: 1.8rem;
             }
             
-            header p {
-                font-size: 0.9rem;
+            .user-info {
+                flex-direction: column;
+                gap: 10px;
             }
             
-            .stats-box, .api-config, .quick-actions {
+            .message {
+                max-width: 95%;
+                padding: 15px;
+            }
+            
+            .stats-box, .api-config, .quick-actions, .learning-materials {
                 min-width: 100%;
             }
             
-            .input-container {
+            .modal-body {
+                padding: 20px;
+            }
+            
+            .modal-footer {
                 flex-direction: column;
             }
             
-            #sendButton, #stopButton {
+            .modal-footer button {
                 width: 100%;
-                margin: 5px 0;
             }
         }
     </style>
 </head>
 <body>
+    <!-- Анимирован Background -->
+    <div class="animated-bg">
+        <div class="bg-gradient"></div>
+        <div class="bg-particles" id="particlesContainer"></div>
+    </div>
+
     <!-- Нэвтрэлт цонх -->
-    <div id="loginModal" class="modal">
-        <div class="modal-content login-content">
+    <div id="loginModal" class="modal active">
+        <div class="modal-content login-content glass">
             <div class="login-header">
-                <h2>⚪ PEARL AI BOT</h2>
+                <div class="login-logo">
+                    <div class="logo">⚪</div>
+                </div>
+                <h2>PEARL AI BOT</h2>
                 <p>Нэвтрэх эсвэл бүртгүүлэх</p>
             </div>
             
@@ -754,11 +1174,11 @@
                 
                 <div class="login-actions">
                     <button id="loginBtn" class="login-btn">Нэвтрэх</button>
-                    <button id="registerBtn" class="register-btn"> Бүртгүүлэх</button>
+                    <button id="registerBtn" class="register-btn">Бүртгүүлэх</button>
                 </div>
                 
                 <div class="login-footer">
-                    <p>Нууц үгээ мартсан уу? <a href="#" id="forgotPassword">Энд дарж</a> сэргээнэ үү</p>
+                    <p>Нууц үгээ мартсан уу? <a href="#" id="forgotPassword" class="forgot-link">Энд дарж</a> сэргээнэ үү</p>
                 </div>
             </div>
         </div>
@@ -766,9 +1186,14 @@
 
     <!-- Гол апп контейнер -->
     <div class="container" id="appContainer" style="display: none;">
-        <header>
-            <h1>⚪ PEARL AI BOT</h1>
-            <p>DEMO MODEL MADE BY TELMNSL</p>
+        <header class="glass">
+            <div class="brand">
+                <div class="logo">⚪</div>
+                <div class="brand-text">
+                    <h1>PEARL AI BOT</h1>
+                    <p>DEMO MODEL MADE BY TELMNSL</p>
+                </div>
+            </div>
             <div class="user-info">
                 <span id="userDisplayName">Хэрэглэгч</span>
                 <button id="logoutBtn" class="logout-btn">Гарах</button>
@@ -776,7 +1201,15 @@
         </header>
 
         <main>
-            <div class="chat-container">
+            <div class="chat-container glass">
+                <div class="chat-header">
+                    <h3><span class="status-indicator"></span> AI Туслах</h3>
+                    <div class="chat-controls">
+                        <button class="theme-btn">Өнгө солих</button>
+                        <button class="export-btn">Экспортлох</button>
+                    </div>
+                </div>
+                
                 <div class="chat-messages" id="chatMessages">
                     <!-- Энд мессежүүд харагдана -->
                 </div>
@@ -786,36 +1219,63 @@
                         <textarea id="messageInput" placeholder="Энд мессежээ бичнэ үү (Enter дарж илгээнэ үү)..." 
                                   rows="1" autocomplete="off"></textarea>
                     </div>
-                    <button id="sendButton">Илгээх</button>
-                    <button id="stopButton" class="stop-button" style="display: none;">ЗОГСООХ</button>
+                    <div class="input-actions">
+                        <button id="sendButton" class="send-btn">Илгээх</button>
+                        <button id="stopButton" class="stop-button" style="display: none;">ЗОГСООХ</button>
+                    </div>
                 </div>
             </div>
 
             <div class="sidebar">
-                <div class="stats-box">
-                    <h3> Статистик</h3>
-                    <div id="statsContent">
-                        <p> Мессеж: <span id="messageCount">0</span></p>
-                        <p> Мэдлэг: <span id="knowledgeCount">8</span></p>
-                        <p> Хэрэглэгч: <span id="userCount">1</span></p>
+                <div class="stats-box glass">
+                    <div class="stats-header">
+                        <h3>📊 Статистик</h3>
+                        <button class="refresh-btn">🔄</button>
+                    </div>
+                    <div class="stats-content">
+                        <div class="stat-item">
+                            <span class="stat-label">Мессеж:</span>
+                            <span class="stat-value" id="messageCount">0</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">Мэдлэг:</span>
+                            <span class="stat-value" id="knowledgeCount">8</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">Хэрэглэгч:</span>
+                            <span class="stat-value" id="userCount">1</span>
+                        </div>
                     </div>
                 </div>
 
-                <div class="api-config">
-                    <h3>API Тохиргоо</h3>
-                    <input type="password" id="apiKeyInput" placeholder="OpenAI API Key оруулах...">
-                    <button id="saveApiKey"> Хадгалах</button>
+                <div class="api-config glass">
+                    <h3>🔑 API Тохиргоо</h3>
+                    <div class="api-form">
+                        <input type="password" id="apiKeyInput" placeholder="OpenAI API Key оруулах...">
+                        <button id="saveApiKey" class="save-btn">Хадгалах</button>
+                    </div>
+                    <div class="api-info">
+                        <p>API Key оруулахгүй бол суурь мэдлэгийн сан ашиглагдана</p>
+                    </div>
                 </div>
 
-                <div class="quick-actions">
-                    <h3>Хурдан үйлдлүүд</h3>
-                    <button class="quick-btn" data-command="чи хэн бэ"> Чи хэн бэ</button>
-                    <button class="quick-btn" data-command="юу хийж чадах вэ"> Юу хийж чадах вэ</button>
-                    <button class="quick-btn" data-command="монгол үсэг">🇲🇳 Монгол үсэг</button>
-                    <button class="quick-btn" id="addKnowledgeBtn">Мэдлэг нэмэх</button>
-                    <button class="quick-btn" id="viewKnowledgeBtn">Мэдлэг харах</button>
-                    <button class="quick-btn" id="clearChatBtn"> Цэвэрлэх</button>
-                    <button class="quick-btn" data-command="тусламж">Тусламж</button>
+                <div class="quick-actions glass">
+                    <div class="actions-header">
+                        <h3>⚡ Хурдан үйлдлүүд</h3>
+                        <div class="action-badges">
+                            <span class="badge new">ШИНЭ</span>
+                        </div>
+                    </div>
+                    <div class="quick-buttons-grid">
+                        <button class="quick-btn" data-command="чи хэн бэ">👤 Чи хэн бэ</button>
+                        <button class="quick-btn" data-command="юу хийж чадах вэ">💪 Юу хийж чадах вэ</button>
+                        <button class="quick-btn" data-command="монгол үсэг">🇲🇳 Монгол үсэг</button>
+                        <button class="quick-btn" id="addKnowledgeBtn">🎓 Мэдлэг нэмэх</button>
+                        <button class="quick-btn" id="viewKnowledgeBtn">📚 Мэдлэг харах</button>
+                        <button class="quick-btn" id="clearChatBtn">🗑️ Цэвэрлэх</button>
+                        <button class="quick-btn" data-command="тусламж">❓ Тусламж</button>
+                        <button class="quick-btn" data-command="статистик">📈 Статистик</button>
+                    </div>
                 </div>
             </div>
         </main>
@@ -823,41 +1283,86 @@
 
     <!-- Мэдлэг нэмэх цонх -->
     <div id="knowledgeModal" class="modal">
-        <div class="modal-content">
-            <span class="close">&times;</span>
-            <h2>🎓 Шинэ мэдлэг нэмэх</h2>
-            <div class="form-group">
-                <label for="questionInput">Асуулт (Монгол үсгээр):</label>
-                <input type="text" id="questionInput" placeholder="Жишээ: сайн уу">
+        <div class="modal-content glass">
+            <div class="modal-header">
+                <h2>🎓 Шинэ мэдлэг нэмэх</h2>
+                <span class="close">&times;</span>
             </div>
-            <div class="form-group">
-                <label for="answerInput">Хариулт (Монгол үсгээр):</label>
-                <textarea id="answerInput" placeholder="Жишээ: Сайн уу! Тавтай морил!" rows="4"></textarea>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="questionInput">Асуулт (Монгол үсгээр):</label>
+                    <input type="text" id="questionInput" placeholder="Жишээ: сайн уу">
+                </div>
+                <div class="form-group">
+                    <label for="answerInput">Хариулт (Монгол үсгээр):</label>
+                    <textarea id="answerInput" placeholder="Жишээ: Сайн уу! Тавтай морил!" rows="4"></textarea>
+                </div>
             </div>
-            <button id="saveKnowledgeBtn"> Хадгалах</button>
+            <div class="modal-footer">
+                <button class="cancel-btn">Цуцлах</button>
+                <button id="saveKnowledgeBtn" class="save-btn">Хадгалах</button>
+            </div>
         </div>
     </div>
 
     <!-- Мэдлэг харах цонх -->
     <div id="viewKnowledgeModal" class="modal">
-        <div class="modal-content" style="max-width: 600px;">
-            <span class="close">&times;</span>
-            <h2>📚 Мэдлэгийн сан</h2>
-            <div class="knowledge-list" id="knowledgeList">
-                <!-- Энд мэдлэгийн жагсаалт харуулагдана -->
+        <div class="modal-content glass" style="max-width: 700px;">
+            <div class="modal-header">
+                <h2>📚 Мэдлэгийн сан</h2>
+                <span class="close">&times;</span>
             </div>
-            <div style="text-align: center; margin-top: 15px;">
-                <button id="closeKnowledgeModalBtn" class="knowledge-edit-btn">Хаах</button>
+            <div class="modal-body">
+                <div class="knowledge-list" id="knowledgeList">
+                    <!-- Энд мэдлэгийн жагсаалт харуулагдана -->
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button id="closeKnowledgeModalBtn" class="cancel-btn">Хаах</button>
             </div>
         </div>
     </div>
 
     <script>
+        // Background particles үүсгэх
+        function createParticles() {
+            const container = document.getElementById('particlesContainer');
+            const particleCount = 30;
+            
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                
+                // Санамсаргүй хэмжээ, байршил, хурд
+                const size = Math.random() * 4 + 1;
+                const posX = Math.random() * 100;
+                const posY = Math.random() * 100;
+                const duration = Math.random() * 20 + 10;
+                const delay = Math.random() * 5;
+                
+                particle.style.width = `${size}px`;
+                particle.style.height = `${size}px`;
+                particle.style.left = `${posX}%`;
+                particle.style.top = `${posY}%`;
+                particle.style.animationDuration = `${duration}s`;
+                particle.style.animationDelay = `${delay}s`;
+                
+                container.appendChild(particle);
+            }
+        }
+
+        // Auto-growing textarea
+        function autoGrowTextarea(textarea) {
+            textarea.style.height = 'auto';
+            const newHeight = Math.min(textarea.scrollHeight, 120);
+            textarea.style.height = newHeight + 'px';
+        }
+
         // Нэвтрэлт систем
         let currentUser = null;
         let isLoggedIn = false;
 
-        // Мэдлэгийн сан - LocalStorage-с ачаалах
+        // Мэдлэгийн сан
         let knowledgeBase = JSON.parse(localStorage.getItem('knowledgeBase')) || {
             "сайн уу": "🌟 Сайн уу! Миний сайхан хэрэглэгч! Тавтай морил! 🤗\nБи танд яаж туслах боломжтой вэ?",
             "баярлалаа": "❤️ Баярлалаа! Таны хүндэтгэлд баяртай байна! 🎉",
@@ -869,13 +1374,13 @@
             "үг": "📚 Би Монгол үсгийг бүрэн дэмждэг! Ү, ү, Ө, ө, Ң, ң зэрэг бүх үсэг ажиллана!"
         };
 
-        // API Key - LocalStorage-с ачаалах
+        // API Key
         let apiKey = localStorage.getItem('apiKey') || '';
 
         // Хувьсагчид
         let messageCount = parseInt(localStorage.getItem('messageCount')) || 0;
         let knowledgeCount = Object.keys(knowledgeBase).length;
-        let currentRequestController = null; // Хүсэлтийг зогсоох контроллер
+        let currentRequestController = null;
 
         // DOM элементүүд
         const loginModal = document.getElementById('loginModal');
@@ -907,61 +1412,41 @@
         const saveApiKey = document.getElementById('saveApiKey');
         const knowledgeList = document.getElementById('knowledgeList');
         const closeKnowledgeModalBtn = document.getElementById('closeKnowledgeModalBtn');
+        const cancelBtn = document.querySelector('.cancel-btn');
 
-        // Auto-growing textarea функц
-        function autoGrowTextarea(textarea) {
-            // Reset height to auto to get the correct scrollHeight
-            textarea.style.height = 'auto';
-            
-            // Set new height based on content
-            const newHeight = Math.min(textarea.scrollHeight, 120); // Max 120px
-            textarea.style.height = newHeight + 'px';
-        }
-
-        // Эхлэх үед нэвтрэлт цонх харуулах
+        // Эхлэх үед
         window.addEventListener('DOMContentLoaded', () => {
-            // Хэрэглэгч нэвтрээгүй бол нэвтрэлт цонх харуулах
+            createParticles();
+            
             if (!isLoggedIn) {
-                loginModal.style.display = 'block';
+                loginModal.classList.add('active');
                 appContainer.style.display = 'none';
             }
             
-            // API Key-г тохируулах
             apiKeyInput.value = apiKey;
-            
-            // Статистик шинэчлэх
             updateStats();
-            
             usernameInput.focus();
         });
 
-        // Нэвтрэх товчлуур
+        // Нэвтрэх
         loginBtn.addEventListener('click', () => {
             const username = usernameInput.value.trim();
             const password = passwordInput.value.trim();
             
             if (username && password) {
-                // Энд бодит нэвтрэх логик байх ёстой
-                // Одоогоор загвар логик ашиглаж байна
                 currentUser = {
                     username: username,
-                    displayName: username.split('@')[0] // Имэйл бол эхний хэсгийг ашиглах
+                    displayName: username.split('@')[0]
                 };
                 
                 isLoggedIn = true;
                 
-                // Нэвтрэлт цонх хаах
-                loginModal.style.display = 'none';
+                loginModal.classList.remove('active');
                 appContainer.style.display = 'flex';
                 
-                // Хэрэглэгчийн нэрийг харуулах
                 userDisplayName.textContent = currentUser.displayName;
                 
-                // Welcome мессеж харуулах
-                addSystemMessage(` ⚪ ${currentUser.displayName}⚪  тавтай морил! 
-                
-        Энэхүү систем нь Монгол улсын хиймэл оюун ухаант төрийн системлүү чиглүүлсэн demo хувилбар юм.
-         Баруун талын хөнгөвчлөх товчнуудыг ашиглаж ерөнхий мэдээллийг авна уу!`);
+                addSystemMessage(`⚪ ${currentUser.displayName} ⚪ тавтай морил!\n\nЭнэхүү систем нь Монгол улсын хиймэл оюун ухаант төрийн системлүү чиглүүлсэн demo хувилбар юм.\nБаруун талын хөнгөвчлөх товчнуудыг ашиглаж ерөнхий мэдээллийг авна уу!`);
                 
                 messageInput.focus();
             } else {
@@ -969,14 +1454,12 @@
             }
         });
 
-        // Бүртгүүлэх товчлуур
+        // Бүртгүүлэх
         registerBtn.addEventListener('click', () => {
             const username = usernameInput.value.trim();
             const password = passwordInput.value.trim();
             
             if (username && password) {
-                // Энд бодит бүртгүүлэх логик байх ёстой
-                // Одоогоор загвар логик ашиглаж байна
                 alert(`Бүртгэл үүсгэх хүсэлт илгээгдлээ! ${username} хаяг руу баталгаажуулах имэйл илгээгдсэн байна.`);
             } else {
                 alert('Бүртгэлийн дугаар болон нууц үгээ оруулна уу!');
@@ -995,21 +1478,18 @@
             }
         });
 
-        // Гарах товчлуур
+        // Гарах
         logoutBtn.addEventListener('click', () => {
             if (confirm('Та системээс гарахдаа итгэлтэй байна уу?')) {
                 currentUser = null;
                 isLoggedIn = false;
                 
-                // Нэвтрэлт цонх харуулах
-                loginModal.style.display = 'block';
+                loginModal.classList.add('active');
                 appContainer.style.display = 'none';
                 
-                // Хэрэглэгчийн талбаруудыг цэвэрлэх
                 usernameInput.value = '';
                 passwordInput.value = '';
                 
-                // Чат цэвэрлэх
                 clearChat();
                 
                 usernameInput.focus();
@@ -1023,50 +1503,38 @@
             addSystemMessage('✅ API Key амжилттай хадгалагдлаа!');
         });
 
-        // Textarea event listeners
+        // Textarea events
         messageInput.addEventListener('input', function() {
             autoGrowTextarea(this);
         });
 
-        // Enter дархад шинэ мөр нэмэхгүй, илгээх
         messageInput.addEventListener('keydown', function(e) {
             if (e.key === 'Enter') {
                 if (e.shiftKey) {
-                    // Shift+Enter дархад шинэ мөр нэмнэ
                     return;
                 } else {
-                    // Enter дархад мессеж илгээнэ
                     e.preventDefault();
                     sendMessage();
                 }
             }
         });
 
-        // Мессеж илгээх функц
+        // Мессеж илгээх
         async function sendMessage() {
             const message = messageInput.value.trim();
             if (message === '') return;
             
             addUserMessage(message);
             messageInput.value = '';
-            
-            // Textarea өндрийг дахин тохируулах
             autoGrowTextarea(messageInput);
             
-            // Зогсоох товчлуурыг идэвхжүүлэх
             stopButton.style.display = 'block';
-            
-            // Бодож байгаа мэт эффект харуулах
             showThinkingIndicator();
             
-            // 1-2 секундын саатал нэмэх
             await new Promise(resolve => setTimeout(resolve, 1500));
-            
-            // Бодож байгаа мэт эффект нуух
             hideThinkingIndicator();
             
             try {
-                // Хүсэлтийн контроллер үүсгэх
                 currentRequestController = new AbortController();
                 const signal = currentRequestController.signal;
                 
@@ -1080,13 +1548,12 @@
                     console.error("Алдаа:", error);
                 }
             } finally {
-                // Зогсоох товчлуурыг идэвхгүй болгох
                 stopButton.style.display = 'none';
                 currentRequestController = null;
             }
         }
 
-        // Зогсоох товчлуур
+        // Зогсоох
         stopButton.addEventListener('click', () => {
             if (currentRequestController) {
                 currentRequestController.abort();
@@ -1094,7 +1561,7 @@
             }
         });
 
-        // Бодож байгаа мэт эффект харуулах
+        // Бодож байгаа индикатор
         function showThinkingIndicator() {
             let indicator = document.createElement('div');
             indicator.id = 'thinkingIndicator';
@@ -1111,7 +1578,6 @@
             scrollToBottom();
         }
 
-        // Бодож байгаа мэт эффект нуух
         function hideThinkingIndicator() {
             const indicator = document.getElementById('thinkingIndicator');
             if (indicator) {
@@ -1119,12 +1585,12 @@
             }
         }
 
-        // Хэрэглэгчийн мессеж нэмэх
+        // Мессеж нэмэх функцууд
         function addUserMessage(message) {
             const messageElement = document.createElement('div');
             messageElement.classList.add('message', 'user-message');
             messageElement.innerHTML = `
-                <div>${formatMessage(message)}</div>
+                <div class="message-content">${formatMessage(message)}</div>
                 <div class="message-info">👤 ${currentUser.displayName} · ${getCurrentTime()}</div>
             `;
             chatMessages.appendChild(messageElement);
@@ -1134,7 +1600,6 @@
             updateStats();
         }
 
-        // Ботын мессеж нэмэх
         function addBotMessage(message) {
             const messageElement = document.createElement('div');
             messageElement.classList.add('message', 'bot-message', 'streaming-message');
@@ -1145,53 +1610,47 @@
             chatMessages.appendChild(messageElement);
             scrollToBottom();
             
-            // Үгүүдийг нэг нэгээр нь харуулах
             typewriterEffect(messageElement.querySelector('.message-content'), message);
         }
 
-        // Систем мессеж нэмэх
         function addSystemMessage(message) {
             const messageElement = document.createElement('div');
             messageElement.classList.add('message', 'system-message');
             messageElement.innerHTML = `
-                <div>${formatMessage(message)}</div>
+                <div class="message-content">${formatMessage(message)}</div>
                 <div class="message-info">⚙️ Систем · ${getCurrentTime()}</div>
             `;
             chatMessages.appendChild(messageElement);
             scrollToBottom();
         }
 
-        // Үгүүдийг нэг нэгээр нь харуулах эффект
+        // Typewriter эффект
         function typewriterEffect(element, text, speed = 20) {
             let i = 0;
             element.innerHTML = '';
             
             const typeInterval = setInterval(() => {
                 if (i < text.length) {
-                    // Дараагийн үгийг нэмэх
                     const char = text.charAt(i);
                     element.innerHTML += char === '\n' ? '<br>' : char;
                     i++;
                     scrollToBottom();
                 } else {
                     clearInterval(typeInterval);
-                    // Эффект дууссан бол streaming классыг хасах
                     element.closest('.message').classList.remove('streaming-message');
                 }
             }, speed);
         }
 
-        // Мессежийг форматлах (шинэ мөрүүдийг хадгалах)
+        // Туслах функцууд
         function formatMessage(message) {
             return message.replace(/\n/g, '<br>');
         }
 
-        // Scroll доош чиглүүлэх
         function scrollToBottom() {
             chatMessages.scrollTop = chatMessages.scrollHeight;
         }
 
-        // Одоо цагийг авах
         function getCurrentTime() {
             const now = new Date();
             return `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
@@ -1201,7 +1660,6 @@
         async function getResponse(message, signal) {
             const messageLower = message.toLowerCase().trim();
             
-            // Тусгай командууд
             if (messageLower === 'статистик' || messageLower === 'stats') {
                 return getStats();
             }
@@ -1215,19 +1673,16 @@
                 return knowledgeBase['тусламж'] || 'Тусламжийн мэдээлэл олдсонгүй';
             }
             
-            // Монгол үсгийн тусгай асуултууд
             if (/[үөң]/.test(messageLower)) {
                 if (messageLower.includes('үсэг') || messageLower.includes('үсг')) {
                     return "✅ Монгол үсэг бүрэн дэмжигддэг! Ү, ү, Ө, ө, Ң, ң зэрэг бүх үсэг ажиллана! 🎉";
                 }
             }
             
-            // Мэдлэгийн сангаас хариулт хайх
             if (knowledgeBase[messageLower]) {
                 return knowledgeBase[messageLower];
             }
             
-            // OpenAI API ашиглан хариулт авах
             if (apiKey) {
                 return await getAIResponse(message, signal);
             } else {
@@ -1235,7 +1690,7 @@
             }
         }
 
-        // OpenAI API ашиглан хариулт авах
+        // OpenAI API
         async function getAIResponse(message, signal) {
             try {
                 const response = await fetch('https://api.openai.com/v1/chat/completions', {
@@ -1275,19 +1730,17 @@
             }
         }
 
-        // Статистик авах
+        // Статистик
         function getStats() {
             return `📊 Статистик:\n• Нийт мессеж: ${messageCount}\n• Нийт мэдлэг: ${knowledgeCount}\n• Хэрэглэгч: 1`;
         }
 
-        // Статистик шинэчлэх
         function updateStats() {
             messageCountElement.textContent = messageCount;
             knowledgeCountElement.textContent = knowledgeCount;
             userCountElement.textContent = isLoggedIn ? 1 : 0;
         }
 
-        // Чат цэвэрлэх
         function clearChat() {
             chatMessages.innerHTML = '';
             messageCount = 0;
@@ -1295,7 +1748,7 @@
             updateStats();
         }
 
-        // Шинэ мэдлэг нэмэх
+        // Мэдлэг нэмэх
         function addKnowledge() {
             const question = questionInput.value.trim();
             const answer = answerInput.value.trim();
@@ -1304,36 +1757,30 @@
                 knowledgeBase[question.toLowerCase()] = answer;
                 knowledgeCount++;
                 
-                // LocalStorage-д хадгалах
                 localStorage.setItem('knowledgeBase', JSON.stringify(knowledgeBase));
                 
                 updateStats();
                 
-                // Модаль хаах
-                knowledgeModal.style.display = 'none';
+                knowledgeModal.classList.remove('active');
                 questionInput.value = '';
                 answerInput.value = '';
                 
-                // Амжилттай нэмсэн мэдээлэл өгөх
                 addSystemMessage("✅ Шинэ мэдлэг амжилттай нэмэгдлээ! 🎉");
             } else {
                 alert('Асуулт болон хариултыг бөглөнө үү!');
             }
         }
 
-        // Мэдлэг харах функц
+        // Мэдлэг харах
         function viewKnowledge() {
-            // Мэдлэгийн жагсаалтыг цэвэрлэх
             knowledgeList.innerHTML = '';
             
-            // Мэдлэг байхгүй бол мэдэгдэл харуулах
             if (Object.keys(knowledgeBase).length === 0) {
                 knowledgeList.innerHTML = '<div class="empty-knowledge">Мэдлэгийн сан хоосон байна</div>';
-                viewKnowledgeModal.style.display = 'block';
+                viewKnowledgeModal.classList.add('active');
                 return;
             }
             
-            // Мэдлэгүүдийг харуулах
             Object.keys(knowledgeBase).forEach(question => {
                 const knowledgeItem = document.createElement('div');
                 knowledgeItem.className = 'knowledge-item';
@@ -1348,7 +1795,6 @@
                 knowledgeList.appendChild(knowledgeItem);
             });
             
-            // Засах, устгах товчлууруудад event listener нэмэх
             document.querySelectorAll('.knowledge-edit-btn').forEach(btn => {
                 btn.addEventListener('click', function() {
                     const question = this.getAttribute('data-question');
@@ -1363,49 +1809,29 @@
                 });
             });
             
-            // Модаль цонхыг харуулах
-            viewKnowledgeModal.style.display = 'block';
+            viewKnowledgeModal.classList.add('active');
         }
 
-        // Мэдлэг засах функц
+        // Мэдлэг засах
         function editKnowledge(question) {
-            // Мэдлэг нэмэх цонхыг нээх
-            knowledgeModal.style.display = 'block';
-            
-            // Талбаруудыг бөглөх
+            knowledgeModal.classList.add('active');
             questionInput.value = question;
             answerInput.value = knowledgeBase[question];
+            viewKnowledgeModal.classList.remove('active');
             
-            // Мэдлэг харах цонхыг хаах
-            viewKnowledgeModal.style.display = 'none';
-            
-            // Хадгалах товчлуурын үйлдлийг өөрчлөх
             saveKnowledgeBtn.onclick = function() {
                 const newQuestion = questionInput.value.trim();
                 const newAnswer = answerInput.value.trim();
                 
                 if (newQuestion && newAnswer) {
-                    // Хуучин мэдлэгийг устгах
                     delete knowledgeBase[question];
-                    
-                    // Шинэ мэдлэг нэмэх
                     knowledgeBase[newQuestion.toLowerCase()] = newAnswer;
-                    
-                    // LocalStorage-д хадгалах
                     localStorage.setItem('knowledgeBase', JSON.stringify(knowledgeBase));
-                    
-                    // Статистик шинэчлэх
                     updateStats();
-                    
-                    // Модаль цонх хаах
-                    knowledgeModal.style.display = 'none';
+                    knowledgeModal.classList.remove('active');
                     questionInput.value = '';
                     answerInput.value = '';
-                    
-                    // Амжилттай зассан мэдээлэл өгөх
                     addSystemMessage("✅ Мэдлэг амжилттай засагдлаа! 🎉");
-                    
-                    // Хадгалах товчлуурын үйлдлийг буцаах
                     saveKnowledgeBtn.onclick = addKnowledge;
                 } else {
                     alert('Асуулт болон хариултыг бөглөнө үү!');
@@ -1413,31 +1839,21 @@
             };
         }
 
-        // Мэдлэг устгах функц
+        // Мэдлэг устгах
         function deleteKnowledge(question) {
             if (confirm(`"${question}" мэдлэгийг устгахдаа итгэлтэй байна уу?`)) {
-                // Мэдлэгийг устгах
                 delete knowledgeBase[question];
                 knowledgeCount--;
-                
-                // LocalStorage-д хадгалах
                 localStorage.setItem('knowledgeBase', JSON.stringify(knowledgeBase));
-                
-                // Статистик шинэчлэх
                 updateStats();
-                
-                // Мэдлэгийн жагсаалтыг дахин харуулах
                 viewKnowledge();
-                
-                // Устгасан мэдээлэл өгөх
                 addSystemMessage("🗑️ Мэдлэг амжилттай устгагдлаа");
             }
         }
 
-        // Үйлдэлд event listener үүсгэх
+        // Event listeners
         sendButton.addEventListener('click', sendMessage);
 
-        // Хурдан товчлуурууд
         document.querySelectorAll('.quick-btn').forEach(button => {
             if (button.id !== 'addKnowledgeBtn' && button.id !== 'viewKnowledgeBtn' && button.id !== 'clearChatBtn') {
                 button.addEventListener('click', () => {
@@ -1447,49 +1863,44 @@
             }
         });
 
-        // Мэдлэг нэмэх товчлуур
         addKnowledgeBtn.addEventListener('click', () => {
-            knowledgeModal.style.display = 'block';
+            knowledgeModal.classList.add('active');
             questionInput.focus();
         });
 
-        // Мэдлэг харах товчлуур
         viewKnowledgeBtn.addEventListener('click', viewKnowledge);
 
-        // Чат цэвэрлэх товчлуур
         clearChatBtn.addEventListener('click', () => {
             clearChat();
             addSystemMessage("💬 Чат цэвэрлэгдлээ! 'сайн уу' гэж бичээд эхлүүлээрэй!");
         });
 
-        // Модаль хаах
         closeModal.forEach(closeBtn => {
             closeBtn.addEventListener('click', function() {
-                this.closest('.modal').style.display = 'none';
+                this.closest('.modal').classList.remove('active');
             });
         });
 
-        // Модаль гадна дээр дархад хаах
+        cancelBtn.addEventListener('click', () => {
+            knowledgeModal.classList.remove('active');
+        });
+
         window.addEventListener('click', (e) => {
             if (e.target === knowledgeModal) {
-                knowledgeModal.style.display = 'none';
-                // Хадгалах товчлуурын үйлдлийг буцаах
+                knowledgeModal.classList.remove('active');
                 saveKnowledgeBtn.onclick = addKnowledge;
             }
             if (e.target === viewKnowledgeModal) {
-                viewKnowledgeModal.style.display = 'none';
+                viewKnowledgeModal.classList.remove('active');
             }
         });
 
-        // Мэдлэг нэмэх хадгалах товчлуур
         saveKnowledgeBtn.addEventListener('click', addKnowledge);
 
-        // Мэдлэг харах цонх хаах товчлуур
         closeKnowledgeModalBtn.addEventListener('click', () => {
-            viewKnowledgeModal.style.display = 'none';
+            viewKnowledgeModal.classList.remove('active');
         });
 
-        // Enter дарж модал дотор хадгалах
         questionInput.addEventListener('keypress', (e) => {
             if (e.key === 'Enter') {
                 answerInput.focus();
@@ -1506,5 +1917,3 @@
     </script>
 </body>
 </html>
-
-
