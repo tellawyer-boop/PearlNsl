@@ -1,9 +1,28 @@
-// Нэвтрэлт систем
+// =============================================
+// Firebase Configuration
+// =============================================
+const firebaseConfig = {
+    apiKey: "AIzaSyAgq5jgH4wXaF67rAgbSEyCUAnl5LEJW_0",
+    authDomain: "pearlnsl.firebaseapp.com",
+    projectId: "pearlnsl",
+    storageBucket: "pearlnsl.firebasestorage.app",
+    messagingSenderId: "444781972571",
+    appId: "1:444781972571:web:c7875ad9be48bc1f14c37e"
+};
+
+// Firebase инициализаци
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db = firebase.firestore();
+
+// =============================================
+// Application State
+// =============================================
 let currentUser = null;
 let isLoggedIn = false;
 
-// Мэдлэгийн сан - LocalStorage-с ачаалах
-let knowledgeBase = JSON.parse(localStorage.getItem('knowledgeBase')) || {
+// Анхны мэдлэгийн сан
+const defaultKnowledge = {
     "сайн уу": "🌟 Сайн уу! Миний сайхан хэрэглэгч! Тавтай морил! 🤗\nБи танд яаж туслах боломжтой вэ?",
     "баярлалаа": "❤️ Баярлалаа! Таны хүндэтгэлд баяртай байна! 🎉",
     "баяртай": "✨ Баяртай! Хүндэтгэсэн ярилцлагад баярлалаа! Дараа дахин уулзацгаая! 🌈",
@@ -14,24 +33,63 @@ let knowledgeBase = JSON.parse(localStorage.getItem('knowledgeBase')) || {
     "үг": "📚 Би Монгол үсгийг бүрэн дэмждэг! Ү, ү, Ө, ө, Ң, ң зэрэг бүх үсэг ажиллана!"
 };
 
-// API Key - LocalStorage-с ачаалах
+// API Key
 let apiKey = localStorage.getItem('apiKey') || '';
 
 // Хувьсагчид
 let messageCount = parseInt(localStorage.getItem('messageCount')) || 0;
-let knowledgeCount = Object.keys(knowledgeBase).length;
-let currentRequestController = null; // Хүсэлтийг зогсоох контроллер
+let knowledgeCount = Object.keys(defaultKnowledge).length;
+let currentRequestController = null;
+let knowledgeBase = { ...defaultKnowledge };
 
-// DOM элементүүд
+// =============================================
+// Firestore Knowledge Management
+// =============================================
+
+// Мэдлэгийн сан авах
+async function getKnowledgeBase() {
+    if (!currentUser) return defaultKnowledge;
+    
+    try {
+        const doc = await db.collection('knowledge').doc(currentUser.uid).get();
+        if (doc.exists) {
+            const userKnowledge = doc.data();
+            knowledgeCount = Object.keys(userKnowledge).length;
+            return userKnowledge;
+        } else {
+            // Шинэ хэрэглэгчид анхны мэдлэг үүсгэх
+            await db.collection('knowledge').doc(currentUser.uid).set(defaultKnowledge);
+            knowledgeCount = Object.keys(defaultKnowledge).length;
+            return defaultKnowledge;
+        }
+    } catch (error) {
+        console.error('Мэдлэг авах алдаа:', error);
+        return defaultKnowledge;
+    }
+}
+
+// Мэдлэг хадгалах
+async function saveKnowledge(knowledge) {
+    if (!currentUser) return;
+    
+    try {
+        await db.collection('knowledge').doc(currentUser.uid).set(knowledge);
+        knowledgeCount = Object.keys(knowledge).length;
+        updateStats();
+    } catch (error) {
+        console.error('Мэдлэг хадгалах алдаа:', error);
+    }
+}
+
+// =============================================
+// DOM Elements
+// =============================================
 const loginModal = document.getElementById('loginModal');
 const appContainer = document.getElementById('appContainer');
-const usernameInput = document.getElementById('usernameInput');
-const passwordInput = document.getElementById('passwordInput');
-const loginBtn = document.getElementById('loginBtn');
-const registerBtn = document.getElementById('registerBtn');
-const forgotPassword = document.getElementById('forgotPassword');
 const userDisplayName = document.getElementById('userDisplayName');
+const userAvatar = document.getElementById('userAvatar');
 const logoutBtn = document.getElementById('logoutBtn');
+const googleLoginBtn = document.getElementById('googleLoginBtn');
 const chatMessages = document.getElementById('chatMessages');
 const messageInput = document.getElementById('messageInput');
 const sendButton = document.getElementById('sendButton');
@@ -40,142 +98,162 @@ const messageCountElement = document.getElementById('messageCount');
 const knowledgeCountElement = document.getElementById('knowledgeCount');
 const userCountElement = document.getElementById('userCount');
 const addKnowledgeBtn = document.getElementById('addKnowledgeBtn');
+const viewKnowledgeBtn = document.getElementById('viewKnowledgeBtn');
 const clearChatBtn = document.getElementById('clearChatBtn');
 const knowledgeModal = document.getElementById('knowledgeModal');
-const closeModal = document.querySelector('.close');
+const viewKnowledgeModal = document.getElementById('viewKnowledgeModal');
+const closeModal = document.querySelectorAll('.close');
 const saveKnowledgeBtn = document.getElementById('saveKnowledgeBtn');
 const questionInput = document.getElementById('questionInput');
 const answerInput = document.getElementById('answerInput');
 const apiKeyInput = document.getElementById('apiKeyInput');
 const saveApiKey = document.getElementById('saveApiKey');
+const knowledgeList = document.getElementById('knowledgeList');
+const closeKnowledgeModalBtn = document.getElementById('closeKnowledgeModalBtn');
+const cancelBtn = document.querySelector('.cancel-btn');
 
-// Эхлэх үед нэвтрэлт цонх харуулах
-window.addEventListener('DOMContentLoaded', () => {
-    // Хэрэглэгч нэвтрээгүй бол нэвтрэлт цонх харуулах
-    if (!isLoggedIn) {
-        loginModal.style.display = 'block';
-        appContainer.style.display = 'none';
-    }
+// =============================================
+// Firebase Authentication
+// =============================================
+googleLoginBtn.addEventListener('click', () => {
+    const provider = new firebase.auth.GoogleAuthProvider();
     
-    // API Key-г тохируулах
-    apiKeyInput.value = apiKey;
-    
-    // Статистик шинэчлэх
-    updateStats();
-    
-    usernameInput.focus();
+    auth.signInWithPopup(provider)
+        .then((result) => {
+            const user = result.user;
+            handleSuccessfulLogin(user);
+        })
+        .catch((error) => {
+            console.error('Нэвтрэх алдаа:', error);
+            alert('Нэвтрэхэд алдаа гарлаа: ' + error.message);
+        });
 });
 
-// Нэвтрэх товчлуур
-loginBtn.addEventListener('click', () => {
-    const username = usernameInput.value.trim();
-    const password = passwordInput.value.trim();
-    
-    if (username && password) {
-        // Энд бодит нэвтрэх логик байх ёстой
-        // Одоогоор загвар логик ашиглаж байна
-        currentUser = {
-            username: username,
-            displayName: username.split('@')[0] // Имэйл бол эхний хэсгийг ашиглах
-        };
-        
-        isLoggedIn = true;
-        
-        // Нэвтрэлт цонх хаах
-        loginModal.style.display = 'none';
-        appContainer.style.display = 'flex';
-        
-        // Хэрэглэгчийн нэрийг харуулах
-        userDisplayName.textContent = currentUser.displayName;
-        
-        // Welcome мессеж харуулах
-        addSystemMessage(` ⚪ ${currentUser.displayName}⚪  тавтай морил! 
-        
-Энэхүү систем нь Монгол улсын хиймэл оюун ухаант төрийн системлүү чиглүүлсэн demo хувилбар юм.
- Баруун талын хөнгөвчлөх товчнуудыг ашиглаж ерөнхий мэдээллийг авна уу!`);
-        
-        messageInput.focus();
-    } else {
-        alert('Бүртгэлийн дугаар болон нууц үгээ оруулна уу!');
-    }
-});
-
-// Бүртгүүлэх товчлуур
-registerBtn.addEventListener('click', () => {
-    const username = usernameInput.value.trim();
-    const password = passwordInput.value.trim();
-    
-    if (username && password) {
-        // Энд бодит бүртгүүлэх логик байх ёстой
-        // Одоогоор загвар логик ашиглаж байна
-        alert(`Бүртгэл үүсгэх хүсэлт илгээгдлээ! ${username} хаяг руу баталгаажуулах имэйл илгээгдсэн байна.`);
-    } else {
-        alert('Бүртгэлийн дугаар болон нууц үгээ оруулна уу!');
-    }
-});
-
-// Нууц үг сэргээх
-forgotPassword.addEventListener('click', (e) => {
-    e.preventDefault();
-    const username = usernameInput.value.trim();
-    
-    if (username) {
-        alert(`${username} хаяг руу нууц үг сэргээх холбоос илгээгдлээ!`);
-    } else {
-        alert('Бүртгэлийн дугаараа оруулна уу!');
-    }
-});
-
-// Гарах товчлуур
 logoutBtn.addEventListener('click', () => {
-    if (confirm('Та системээс гарахдаа итгэлтэй байна уу?')) {
-        currentUser = null;
-        isLoggedIn = false;
-        
-        // Нэвтрэлт цонх харуулах
-        loginModal.style.display = 'block';
-        appContainer.style.display = 'none';
-        
-        // Хэрэглэгчийн талбаруудыг цэвэрлэх
-        usernameInput.value = '';
-        passwordInput.value = '';
-        
-        // Чат цэвэрлэх
-        clearChat();
-        
-        usernameInput.focus();
+    auth.signOut()
+        .then(() => {
+            console.log('Амжилттай гарлаа');
+            handleLogout();
+        })
+        .catch((error) => {
+            console.error('Гарах алдаа:', error);
+        });
+});
+
+auth.onAuthStateChanged((user) => {
+    if (user) {
+        handleSuccessfulLogin(user);
+    } else {
+        handleLogout();
     }
 });
 
-// API Key хадгалах
-saveApiKey.addEventListener('click', () => {
-    apiKey = apiKeyInput.value.trim();
-    localStorage.setItem('apiKey', apiKey);
-    addSystemMessage('✅ API Key амжилттай хадгалагдлаа!');
+// Амжилттай нэвтрэх
+async function handleSuccessfulLogin(user) {
+    currentUser = {
+        uid: user.uid,
+        email: user.email,
+        displayName: user.displayName || user.email.split('@')[0],
+        photoURL: user.photoURL
+    };
+    
+    isLoggedIn = true;
+    
+    // Firestore-оос мэдлэг авах
+    knowledgeBase = await getKnowledgeBase();
+    
+    loginModal.classList.remove('active');
+    appContainer.style.display = 'flex';
+    
+    userDisplayName.textContent = currentUser.displayName;
+    
+    if (currentUser.photoURL) {
+        userAvatar.src = currentUser.photoURL;
+        userAvatar.style.display = 'block';
+    }
+    
+    addSystemMessage(`⚪ ${currentUser.displayName} ⚪ тавтай морил!\n\nЭнэхүү систем нь Монгол улсын хиймэл оюун ухаант төрийн системлүү чиглүүлсэн demo хувилбар юм.\nБаруун талын хөнгөвчлөх товчнуудыг ашиглаж ерөнхий мэдээллийг авна уу!`);
+    
+    messageInput.focus();
+    updateStats();
+}
+
+// Гарах
+function handleLogout() {
+    currentUser = null;
+    isLoggedIn = false;
+    knowledgeBase = { ...defaultKnowledge };
+    knowledgeCount = Object.keys(defaultKnowledge).length;
+    
+    loginModal.classList.add('active');
+    appContainer.style.display = 'none';
+    
+    userAvatar.style.display = 'none';
+    clearChat();
+    updateStats();
+}
+
+// =============================================
+// Application Initialization
+// =============================================
+window.addEventListener('DOMContentLoaded', () => {
+    createParticles();
+    apiKeyInput.value = apiKey;
+    updateStats();
 });
 
-// Мессеж илгээх функц
+// =============================================
+// Background Particles
+// =============================================
+function createParticles() {
+    const container = document.getElementById('particlesContainer');
+    const particleCount = 30;
+    
+    for (let i = 0; i < particleCount; i++) {
+        const particle = document.createElement('div');
+        particle.className = 'particle';
+        
+        const size = Math.random() * 4 + 1;
+        const posX = Math.random() * 100;
+        const posY = Math.random() * 100;
+        const duration = Math.random() * 20 + 10;
+        const delay = Math.random() * 5;
+        
+        particle.style.width = `${size}px`;
+        particle.style.height = `${size}px`;
+        particle.style.left = `${posX}%`;
+        particle.style.top = `${posY}%`;
+        particle.style.animationDuration = `${duration}s`;
+        particle.style.animationDelay = `${delay}s`;
+        
+        container.appendChild(particle);
+    }
+}
+
+// =============================================
+// Chat Functionality
+// =============================================
+function autoGrowTextarea(textarea) {
+    textarea.style.height = 'auto';
+    const newHeight = Math.min(textarea.scrollHeight, 120);
+    textarea.style.height = newHeight + 'px';
+}
+
 async function sendMessage() {
     const message = messageInput.value.trim();
     if (message === '') return;
     
     addUserMessage(message);
     messageInput.value = '';
+    autoGrowTextarea(messageInput);
     
-    // Зогсоох товчлуурыг идэвхжүүлэх
     stopButton.style.display = 'block';
-    
-    // Бодож байгаа мэт эффект харуулах
     showThinkingIndicator();
     
-    // 1-2 секундын саатал нэмэх
     await new Promise(resolve => setTimeout(resolve, 1500));
-    
-    // Бодож байгаа мэт эффект нуух
     hideThinkingIndicator();
     
     try {
-        // Хүсэлтийн контроллер үүсгэх
         currentRequestController = new AbortController();
         const signal = currentRequestController.signal;
         
@@ -189,13 +267,11 @@ async function sendMessage() {
             console.error("Алдаа:", error);
         }
     } finally {
-        // Зогсоох товчлуурыг идэвхгүй болгох
         stopButton.style.display = 'none';
         currentRequestController = null;
     }
 }
 
-// Зогсоох товчлуур
 stopButton.addEventListener('click', () => {
     if (currentRequestController) {
         currentRequestController.abort();
@@ -203,7 +279,6 @@ stopButton.addEventListener('click', () => {
     }
 });
 
-// Бодож байгаа мэт эффект харуулах
 function showThinkingIndicator() {
     let indicator = document.createElement('div');
     indicator.id = 'thinkingIndicator';
@@ -220,7 +295,6 @@ function showThinkingIndicator() {
     scrollToBottom();
 }
 
-// Бодож байгаа мэт эффект нуух
 function hideThinkingIndicator() {
     const indicator = document.getElementById('thinkingIndicator');
     if (indicator) {
@@ -228,12 +302,11 @@ function hideThinkingIndicator() {
     }
 }
 
-// Хэрэглэгчийн мессеж нэмэх
 function addUserMessage(message) {
     const messageElement = document.createElement('div');
     messageElement.classList.add('message', 'user-message');
     messageElement.innerHTML = `
-        <div>${formatMessage(message)}</div>
+        <div class="message-content">${formatMessage(message)}</div>
         <div class="message-info">👤 ${currentUser.displayName} · ${getCurrentTime()}</div>
     `;
     chatMessages.appendChild(messageElement);
@@ -243,7 +316,6 @@ function addUserMessage(message) {
     updateStats();
 }
 
-// Ботын мессеж нэмэх
 function addBotMessage(message) {
     const messageElement = document.createElement('div');
     messageElement.classList.add('message', 'bot-message', 'streaming-message');
@@ -254,63 +326,56 @@ function addBotMessage(message) {
     chatMessages.appendChild(messageElement);
     scrollToBottom();
     
-    // Үгүүдийг нэг нэгээр нь харуулах
     typewriterEffect(messageElement.querySelector('.message-content'), message);
 }
 
-// Систем мессеж нэмэх
 function addSystemMessage(message) {
     const messageElement = document.createElement('div');
     messageElement.classList.add('message', 'system-message');
     messageElement.innerHTML = `
-        <div>${formatMessage(message)}</div>
+        <div class="message-content">${formatMessage(message)}</div>
         <div class="message-info">⚙️ Систем · ${getCurrentTime()}</div>
     `;
     chatMessages.appendChild(messageElement);
     scrollToBottom();
 }
 
-// Үгүүдийг нэг нэгээр нь харуулах эффект
 function typewriterEffect(element, text, speed = 20) {
     let i = 0;
     element.innerHTML = '';
     
     const typeInterval = setInterval(() => {
         if (i < text.length) {
-            // Дараагийн үгийг нэмэх
             const char = text.charAt(i);
             element.innerHTML += char === '\n' ? '<br>' : char;
             i++;
             scrollToBottom();
         } else {
             clearInterval(typeInterval);
-            // Эффект дууссан бол streaming классыг хасах
             element.closest('.message').classList.remove('streaming-message');
         }
     }, speed);
 }
 
-// Мессежийг форматлах (шинэ мөрүүдийг хадгалах)
 function formatMessage(message) {
     return message.replace(/\n/g, '<br>');
 }
 
-// Scroll доош чиглүүлэх
 function scrollToBottom() {
     chatMessages.scrollTop = chatMessages.scrollHeight;
 }
 
-// Одоо цагийг авах
 function getCurrentTime() {
     const now = new Date();
     return `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
 }
 
-// Хариулт авах
+// =============================================
+// AI Response Handling
+// =============================================
 async function getResponse(message, signal) {
     const messageLower = message.toLowerCase().trim();
     
-    // Тусгай командууд
     if (messageLower === 'статистик' || messageLower === 'stats') {
         return getStats();
     }
@@ -324,19 +389,16 @@ async function getResponse(message, signal) {
         return knowledgeBase['тусламж'] || 'Тусламжийн мэдээлэл олдсонгүй';
     }
     
-    // Монгол үсгийн тусгай асуултууд
     if (/[үөң]/.test(messageLower)) {
         if (messageLower.includes('үсэг') || messageLower.includes('үсг')) {
             return "✅ Монгол үсэг бүрэн дэмжигддэг! Ү, ү, Ө, ө, Ң, ң зэрэг бүх үсэг ажиллана! 🎉";
         }
     }
     
-    // Мэдлэгийн сангаас хариулт хайх
     if (knowledgeBase[messageLower]) {
         return knowledgeBase[messageLower];
     }
     
-    // OpenAI API ашиглан хариулт авах
     if (apiKey) {
         return await getAIResponse(message, signal);
     } else {
@@ -344,7 +406,6 @@ async function getResponse(message, signal) {
     }
 }
 
-// OpenAI API ашиглан хариулт авах
 async function getAIResponse(message, signal) {
     try {
         const response = await fetch('https://api.openai.com/v1/chat/completions', {
@@ -384,19 +445,19 @@ async function getAIResponse(message, signal) {
     }
 }
 
-// Статистик авах
+// =============================================
+// Utility Functions
+// =============================================
 function getStats() {
     return `📊 Статистик:\n• Нийт мессеж: ${messageCount}\n• Нийт мэдлэг: ${knowledgeCount}\n• Хэрэглэгч: 1`;
 }
 
-// Статистик шинэчлэх
 function updateStats() {
     messageCountElement.textContent = messageCount;
     knowledgeCountElement.textContent = knowledgeCount;
     userCountElement.textContent = isLoggedIn ? 1 : 0;
 }
 
-// Чат цэвэрлэх
 function clearChat() {
     chatMessages.innerHTML = '';
     messageCount = 0;
@@ -404,44 +465,132 @@ function clearChat() {
     updateStats();
 }
 
-// Шинэ мэдлэг нэмэх
-function addKnowledge() {
+// =============================================
+// Knowledge Base Management
+// =============================================
+async function addKnowledge() {
     const question = questionInput.value.trim();
     const answer = answerInput.value.trim();
     
     if (question && answer) {
+        // Шинэ мэдлэг нэмэх
         knowledgeBase[question.toLowerCase()] = answer;
-        knowledgeCount++;
         
-        // LocalStorage-д хадгалах
-        localStorage.setItem('knowledgeBase', JSON.stringify(knowledgeBase));
+        // Firestore-д хадгалах
+        await saveKnowledge(knowledgeBase);
         
-        updateStats();
-        
-        // Модаль хаах
-        knowledgeModal.style.display = 'none';
+        knowledgeModal.classList.remove('active');
         questionInput.value = '';
         answerInput.value = '';
         
-        // Амжилттай нэмсэн мэдээлэл өгөх
         addSystemMessage("✅ Шинэ мэдлэг амжилттай нэмэгдлээ! 🎉");
     } else {
         alert('Асуулт болон хариултыг бөглөнө үү!');
     }
 }
 
-// Үйлдэлд event listener үүсгэх
+async function viewKnowledge() {
+    knowledgeList.innerHTML = '';
+    
+    if (Object.keys(knowledgeBase).length === 0) {
+        knowledgeList.innerHTML = '<div class="empty-knowledge">Мэдлэгийн сан хоосон байна</div>';
+        viewKnowledgeModal.classList.add('active');
+        return;
+    }
+    
+    Object.keys(knowledgeBase).forEach(question => {
+        const knowledgeItem = document.createElement('div');
+        knowledgeItem.className = 'knowledge-item';
+        knowledgeItem.innerHTML = `
+            <div class="knowledge-question">${question}</div>
+            <div class="knowledge-answer">${knowledgeBase[question]}</div>
+            <div class="knowledge-actions">
+                <button class="knowledge-edit-btn" data-question="${question}">Засах</button>
+                <button class="knowledge-delete-btn" data-question="${question}">Устгах</button>
+            </div>
+        `;
+        knowledgeList.appendChild(knowledgeItem);
+    });
+    
+    document.querySelectorAll('.knowledge-edit-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const question = this.getAttribute('data-question');
+            editKnowledge(question);
+        });
+    });
+    
+    document.querySelectorAll('.knowledge-delete-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const question = this.getAttribute('data-question');
+            deleteKnowledge(question);
+        });
+    });
+    
+    viewKnowledgeModal.classList.add('active');
+}
+
+async function editKnowledge(question) {
+    knowledgeModal.classList.add('active');
+    questionInput.value = question;
+    answerInput.value = knowledgeBase[question];
+    viewKnowledgeModal.classList.remove('active');
+    
+    saveKnowledgeBtn.onclick = async function() {
+        const newQuestion = questionInput.value.trim();
+        const newAnswer = answerInput.value.trim();
+        
+        if (newQuestion && newAnswer) {
+            // Хуучин мэдлэг устгах
+            delete knowledgeBase[question];
+            // Шинэ мэдлэг нэмэх
+            knowledgeBase[newQuestion.toLowerCase()] = newAnswer;
+            
+            // Firestore-д хадгалах
+            await saveKnowledge(knowledgeBase);
+            
+            knowledgeModal.classList.remove('active');
+            questionInput.value = '';
+            answerInput.value = '';
+            addSystemMessage("✅ Мэдлэг амжилттай засагдлаа! 🎉");
+            saveKnowledgeBtn.onclick = addKnowledge;
+        } else {
+            alert('Асуулт болон хариултыг бөглөнө үү!');
+        }
+    };
+}
+
+async function deleteKnowledge(question) {
+    if (confirm(`"${question}" мэдлэгийг устгахдаа итгэлтэй байна уу?`)) {
+        delete knowledgeBase[question];
+        // Firestore-д хадгалах
+        await saveKnowledge(knowledgeBase);
+        viewKnowledge();
+        addSystemMessage("🗑️ Мэдлэг амжилттай устгагдлаа");
+    }
+}
+
+// =============================================
+// Event Listeners
+// =============================================
 sendButton.addEventListener('click', sendMessage);
 
-messageInput.addEventListener('keypress', (e) => {
+messageInput.addEventListener('input', function() {
+    autoGrowTextarea(this);
+});
+
+messageInput.addEventListener('keydown', function(e) {
     if (e.key === 'Enter') {
-        sendMessage();
+        if (e.shiftKey) {
+            return;
+        } else {
+            e.preventDefault();
+            sendMessage();
+        }
     }
 });
 
-// Хурдан товчлуурууд
 document.querySelectorAll('.quick-btn').forEach(button => {
-    if (button.id !== 'addKnowledgeBtn' && button.id !== 'clearChatBtn') {
+    if (button.id !== 'addKnowledgeBtn' && button.id !== 'viewKnowledgeBtn' && button.id !== 'clearChatBtn') {
         button.addEventListener('click', () => {
             messageInput.value = button.getAttribute('data-command');
             sendMessage();
@@ -449,34 +598,50 @@ document.querySelectorAll('.quick-btn').forEach(button => {
     }
 });
 
-// Мэдлэг нэмэх товчлуур
 addKnowledgeBtn.addEventListener('click', () => {
-    knowledgeModal.style.display = 'block';
+    knowledgeModal.classList.add('active');
     questionInput.focus();
 });
 
-// Чат цэвэрлэх товчлуур
+viewKnowledgeBtn.addEventListener('click', viewKnowledge);
+
 clearChatBtn.addEventListener('click', () => {
     clearChat();
     addSystemMessage("💬 Чат цэвэрлэгдлээ! 'сайн уу' гэж бичээд эхлүүлээрэй!");
 });
 
-// Модаль хаах
-closeModal.addEventListener('click', () => {
-    knowledgeModal.style.display = 'none';
+closeModal.forEach(closeBtn => {
+    closeBtn.addEventListener('click', function() {
+        this.closest('.modal').classList.remove('active');
+    });
 });
 
-// Модаль гадна дээр дархад хаах
+cancelBtn.addEventListener('click', () => {
+    knowledgeModal.classList.remove('active');
+});
+
 window.addEventListener('click', (e) => {
     if (e.target === knowledgeModal) {
-        knowledgeModal.style.display = 'none';
+        knowledgeModal.classList.remove('active');
+        saveKnowledgeBtn.onclick = addKnowledge;
+    }
+    if (e.target === viewKnowledgeModal) {
+        viewKnowledgeModal.classList.remove('active');
     }
 });
 
-// Мэдлэг нэмэх хадгалах товчлуур
 saveKnowledgeBtn.addEventListener('click', addKnowledge);
 
-// Enter дарж модал дотор хадгалах
+closeKnowledgeModalBtn.addEventListener('click', () => {
+    viewKnowledgeModal.classList.remove('active');
+});
+
+saveApiKey.addEventListener('click', () => {
+    apiKey = apiKeyInput.value.trim();
+    localStorage.setItem('apiKey', apiKey);
+    addSystemMessage('✅ API Key амжилттай хадгалагдлаа!');
+});
+
 questionInput.addEventListener('keypress', (e) => {
     if (e.key === 'Enter') {
         answerInput.focus();
@@ -489,8 +654,4 @@ answerInput.addEventListener('keypress', (e) => {
         addKnowledge();
         e.preventDefault();
     }
-
 });
-function sanitizeInput(input) {
-    return input.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '');
-}
