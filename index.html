@@ -10,7 +10,8 @@
     <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore-compat.js"></script> 
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore-compat.js"></script>
+    
     <style>
         /* Үндсэн стиллүүд */
         * {
@@ -1366,8 +1367,6 @@
         // =============================================
         // Firebase Configuration
         // =============================================
-        
-        // Firebase тохиргоо - ЭНД ӨӨРИЙН FIREBASE PROJECT-ИЙН МЭДЭЭЛЭЛЭЭ ОРУУЛНА УУ
         const firebaseConfig = {
             apiKey: "AIzaSyAgq5jgH4wXaF67rAgbSEyCUAnl5LEJW_0",
             authDomain: "pearlnsl.firebaseapp.com",
@@ -1380,16 +1379,16 @@
         // Firebase инициализаци
         firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
+        const db = firebase.firestore();
 
         // =============================================
         // Application State
         // =============================================
-        
         let currentUser = null;
         let isLoggedIn = false;
 
-        // Мэдлэгийн сан
-        let knowledgeBase = JSON.parse(localStorage.getItem('knowledgeBase')) || {
+        // Анхны мэдлэгийн сан
+        const defaultKnowledge = {
             "сайн уу": "🌟 Сайн уу! Миний сайхан хэрэглэгч! Тавтай морил! 🤗\nБи танд яаж туслах боломжтой вэ?",
             "баярлалаа": "❤️ Баярлалаа! Таны хүндэтгэлд баяртай байна! 🎉",
             "баяртай": "✨ Баяртай! Хүндэтгэсэн ярилцлагад баярлалаа! Дараа дахин уулзацгаая! 🌈",
@@ -1405,13 +1404,59 @@
 
         // Хувьсагчид
         let messageCount = parseInt(localStorage.getItem('messageCount')) || 0;
-        let knowledgeCount = Object.keys(knowledgeBase).length;
+        let knowledgeCount = Object.keys(defaultKnowledge).length;
         let currentRequestController = null;
+        let knowledgeBase = { ...defaultKnowledge };
+
+        // =============================================
+        // Firestore Knowledge Management
+        // =============================================
+
+        // Мэдлэгийн сан авах
+        async function getKnowledgeBase() {
+            if (!currentUser) return defaultKnowledge;
+            
+            try {
+                console.log('Firestore-оос мэдлэг авах...', currentUser.uid);
+                const doc = await db.collection('knowledge').doc(currentUser.uid).get();
+                if (doc.exists) {
+                    const userKnowledge = doc.data();
+                    knowledgeCount = Object.keys(userKnowledge).length;
+                    console.log('Мэдлэг олдлоо:', userKnowledge);
+                    return userKnowledge;
+                } else {
+                    // Шинэ хэрэглэгчид анхны мэдлэг үүсгэх
+                    console.log('Шинэ мэдлэг үүсгэж байна...');
+                    await db.collection('knowledge').doc(currentUser.uid).set(defaultKnowledge);
+                    knowledgeCount = Object.keys(defaultKnowledge).length;
+                    return defaultKnowledge;
+                }
+            } catch (error) {
+                console.error('Мэдлэг авах алдаа:', error);
+                alert('Мэдлэг авахад алдаа гарлаа: ' + error.message);
+                return defaultKnowledge;
+            }
+        }
+
+        // Мэдлэг хадгалах
+        async function saveKnowledge(knowledge) {
+            if (!currentUser) return;
+            
+            try {
+                console.log('Firestore-д хадгалах...', knowledge);
+                await db.collection('knowledge').doc(currentUser.uid).set(knowledge);
+                knowledgeCount = Object.keys(knowledge).length;
+                updateStats();
+                console.log('Мэдлэг амжилттай хадгалагдлаа');
+            } catch (error) {
+                console.error('Мэдлэг хадгалах алдаа:', error);
+                alert('Мэдлэг хадгалахад алдаа гарлаа: ' + error.message);
+            }
+        }
 
         // =============================================
         // DOM Elements
         // =============================================
-        
         const loginModal = document.getElementById('loginModal');
         const appContainer = document.getElementById('appContainer');
         const userDisplayName = document.getElementById('userDisplayName');
@@ -1443,8 +1488,6 @@
         // =============================================
         // Firebase Authentication
         // =============================================
-        
-        // Google нэвтрэх
         googleLoginBtn.addEventListener('click', () => {
             const provider = new firebase.auth.GoogleAuthProvider();
             
@@ -1459,7 +1502,6 @@
                 });
         });
 
-        // Гарах
         logoutBtn.addEventListener('click', () => {
             auth.signOut()
                 .then(() => {
@@ -1471,7 +1513,6 @@
                 });
         });
 
-        // Хэрэглэгчийн төлөв шалгах
         auth.onAuthStateChanged((user) => {
             if (user) {
                 handleSuccessfulLogin(user);
@@ -1481,7 +1522,7 @@
         });
 
         // Амжилттай нэвтрэх
-        function handleSuccessfulLogin(user) {
+        async function handleSuccessfulLogin(user) {
             currentUser = {
                 uid: user.uid,
                 email: user.email,
@@ -1491,12 +1532,19 @@
             
             isLoggedIn = true;
             
+            // Firestore-оос мэдлэг авах
+            try {
+                knowledgeBase = await getKnowledgeBase();
+            } catch (error) {
+                console.error('Мэдлэг авахад алдаа:', error);
+                knowledgeBase = { ...defaultKnowledge };
+            }
+            
             loginModal.classList.remove('active');
             appContainer.style.display = 'flex';
             
             userDisplayName.textContent = currentUser.displayName;
             
-            // Хэрэглэгчийн зураг харуулах
             if (currentUser.photoURL) {
                 userAvatar.src = currentUser.photoURL;
                 userAvatar.style.display = 'block';
@@ -1512,6 +1560,8 @@
         function handleLogout() {
             currentUser = null;
             isLoggedIn = false;
+            knowledgeBase = { ...defaultKnowledge };
+            knowledgeCount = Object.keys(defaultKnowledge).length;
             
             loginModal.classList.add('active');
             appContainer.style.display = 'none';
@@ -1524,7 +1574,6 @@
         // =============================================
         // Application Initialization
         // =============================================
-        
         window.addEventListener('DOMContentLoaded', () => {
             createParticles();
             apiKeyInput.value = apiKey;
@@ -1534,7 +1583,6 @@
         // =============================================
         // Background Particles
         // =============================================
-        
         function createParticles() {
             const container = document.getElementById('particlesContainer');
             const particleCount = 30;
@@ -1563,7 +1611,6 @@
         // =============================================
         // Chat Functionality
         // =============================================
-        
         function autoGrowTextarea(textarea) {
             textarea.style.height = 'auto';
             const newHeight = Math.min(textarea.scrollHeight, 120);
@@ -1704,7 +1751,6 @@
         // =============================================
         // AI Response Handling
         // =============================================
-        
         async function getResponse(message, signal) {
             const messageLower = message.toLowerCase().trim();
             
@@ -1780,7 +1826,6 @@
         // =============================================
         // Utility Functions
         // =============================================
-        
         function getStats() {
             return `📊 Статистик:\n• Нийт мессеж: ${messageCount}\n• Нийт мэдлэг: ${knowledgeCount}\n• Хэрэглэгч: 1`;
         }
@@ -1801,18 +1846,15 @@
         // =============================================
         // Knowledge Base Management
         // =============================================
-        
-        function addKnowledge() {
+        async function addKnowledge() {
             const question = questionInput.value.trim();
             const answer = answerInput.value.trim();
             
             if (question && answer) {
                 knowledgeBase[question.toLowerCase()] = answer;
-                knowledgeCount++;
                 
-                localStorage.setItem('knowledgeBase', JSON.stringify(knowledgeBase));
-                
-                updateStats();
+                // Firestore-д хадгалах
+                await saveKnowledge(knowledgeBase);
                 
                 knowledgeModal.classList.remove('active');
                 questionInput.value = '';
@@ -1824,7 +1866,7 @@
             }
         }
 
-        function viewKnowledge() {
+        async function viewKnowledge() {
             knowledgeList.innerHTML = '';
             
             if (Object.keys(knowledgeBase).length === 0) {
@@ -1864,21 +1906,23 @@
             viewKnowledgeModal.classList.add('active');
         }
 
-        function editKnowledge(question) {
+        async function editKnowledge(question) {
             knowledgeModal.classList.add('active');
             questionInput.value = question;
             answerInput.value = knowledgeBase[question];
             viewKnowledgeModal.classList.remove('active');
             
-            saveKnowledgeBtn.onclick = function() {
+            saveKnowledgeBtn.onclick = async function() {
                 const newQuestion = questionInput.value.trim();
                 const newAnswer = answerInput.value.trim();
                 
                 if (newQuestion && newAnswer) {
                     delete knowledgeBase[question];
                     knowledgeBase[newQuestion.toLowerCase()] = newAnswer;
-                    localStorage.setItem('knowledgeBase', JSON.stringify(knowledgeBase));
-                    updateStats();
+                    
+                    // Firestore-д хадгалах
+                    await saveKnowledge(knowledgeBase);
+                    
                     knowledgeModal.classList.remove('active');
                     questionInput.value = '';
                     answerInput.value = '';
@@ -1890,12 +1934,11 @@
             };
         }
 
-        function deleteKnowledge(question) {
+        async function deleteKnowledge(question) {
             if (confirm(`"${question}" мэдлэгийг устгахдаа итгэлтэй байна уу?`)) {
                 delete knowledgeBase[question];
-                knowledgeCount--;
-                localStorage.setItem('knowledgeBase', JSON.stringify(knowledgeBase));
-                updateStats();
+                // Firestore-д хадгалах
+                await saveKnowledge(knowledgeBase);
                 viewKnowledge();
                 addSystemMessage("🗑️ Мэдлэг амжилттай устгагдлаа");
             }
@@ -1904,7 +1947,6 @@
         // =============================================
         // Event Listeners
         // =============================================
-        
         sendButton.addEventListener('click', sendMessage);
 
         messageInput.addEventListener('input', function() {
@@ -1991,5 +2033,3 @@
     </script>
 </body>
 </html>
-
-
