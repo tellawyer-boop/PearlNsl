@@ -1167,6 +1167,70 @@
             color: var(--warning-color);
         }
 
+        /* Full Screen Chat Styles */
+        .fullscreen-chat {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--dark-bg);
+            z-index: 2000;
+            display: none;
+            flex-direction: column;
+        }
+
+        .fullscreen-chat.active {
+            display: flex;
+        }
+
+        .chat-header-fullscreen {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 30px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            background: var(--surface-dark);
+        }
+
+        .back-to-ai {
+            padding: 10px 20px;
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text-primary);
+            border: none;
+            border-radius: var(--border-radius-sm);
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 600;
+        }
+
+        .back-to-ai:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: translateY(-2px);
+        }
+
+        .chat-messages-fullscreen {
+            flex: 1;
+            padding: 25px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            background: var(--darker-bg);
+        }
+
+        .input-container-fullscreen {
+            padding: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            gap: 15px;
+            align-items: flex-end;
+            background: var(--surface-dark);
+        }
+
         /* Chat Room Styles */
         .chat-room-header {
             display: flex;
@@ -1281,6 +1345,41 @@
             font-weight: 600;
             color: var(--warning-color);
             font-size: 0.8rem;
+        }
+
+        /* Message Input Styles */
+        .message-input-wrapper {
+            flex: 1;
+            position: relative;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: var(--border-radius);
+            padding: 15px 20px;
+            transition: var(--transition);
+        }
+
+        .message-input-wrapper:focus-within {
+            border-color: var(--primary-purple);
+            box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.2);
+        }
+
+        .message-input {
+            width: 100%;
+            min-height: 20px;
+            max-height: 120px;
+            border: none;
+            background: transparent;
+            color: var(--text-primary);
+            font-size: 1rem;
+            outline: none;
+            resize: none;
+            overflow-y: auto;
+            font-family: inherit;
+            line-height: 1.5;
+        }
+
+        .message-input::placeholder {
+            color: var(--text-muted);
         }
 
         /* Scrollbar стиллүүд */
@@ -1640,6 +1739,67 @@
         </div>
     </div>
 
+    <!-- Full Screen Chat Windows -->
+
+    <!-- Хажуу чат (бүтэн дэлгэц) -->
+    <div id="privateChatFullscreen" class="fullscreen-chat">
+        <div class="chat-header-fullscreen">
+            <button class="back-to-ai" id="backToAiFromPrivate">
+                ← AI чат руу буцах
+            </button>
+            <div class="room-info">
+                <div class="friend-avatar" id="fullscreenPrivateChatAvatar">U</div>
+                <div>
+                    <h3 id="fullscreenPrivateChatFriendName">Найз</h3>
+                    <div class="friend-status" id="fullscreenPrivateChatStatus">онлайн</div>
+                </div>
+            </div>
+            <div class="room-actions">
+                <button class="theme-btn">⚙️</button>
+            </div>
+        </div>
+        <div class="chat-messages-fullscreen" id="fullscreenPrivateChatMessages">
+            <!-- Хажуу чатын мессежүүд -->
+        </div>
+        <div class="input-container-fullscreen">
+            <div class="message-input-wrapper">
+                <textarea class="message-input" id="fullscreenPrivateMessageInput" 
+                          placeholder="Энд мессежээ бичнэ үү..." rows="1"></textarea>
+            </div>
+            <div class="input-actions">
+                <button id="fullscreenSendPrivateMessageBtn" class="send-btn">Илгээх</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Өрөөний чат (бүтэн дэлгэц) -->
+    <div id="roomChatFullscreen" class="fullscreen-chat">
+        <div class="chat-header-fullscreen">
+            <button class="back-to-ai" id="backToAiFromRoom">
+                ← AI чат руу буцах
+            </button>
+            <div class="room-info">
+                <h3 id="fullscreenRoomTitle">Өрөө</h3>
+                <span class="member-count" id="fullscreenRoomMemberCount">0</span>
+            </div>
+            <div class="room-actions">
+                <button class="theme-btn" id="fullscreenRoomSettingsBtn">⚙️</button>
+            </div>
+        </div>
+        <div class="chat-messages-fullscreen" id="fullscreenRoomChatMessages">
+            <!-- Өрөөний чатын мессежүүд -->
+        </div>
+        <div class="input-container-fullscreen">
+            <div class="message-input-wrapper">
+                <textarea class="message-input" id="fullscreenRoomMessageInput" 
+                          placeholder="Энд мессежээ бичнэ үү..." rows="1"></textarea>
+            </div>
+            <div class="input-actions">
+                <button id="fullscreenSendRoomMessageBtn" class="send-btn">Илгээх</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Social Chat Modals -->
 
     <!-- Өрөөнүүд харах цонх -->
@@ -1718,61 +1878,6 @@
             </div>
             <div class="modal-footer">
                 <button class="cancel-btn">Хаах</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Хажуу чат цонх -->
-    <div id="privateChatModal" class="modal">
-        <div class="modal-content glass" style="max-width: 600px; height: 80vh; display: flex; flex-direction: column;">
-            <div class="private-chat-header">
-                <div class="friend-avatar" id="privateChatAvatar">U</div>
-                <div>
-                    <div id="privateChatFriendName">Найз</div>
-                    <div class="friend-status" id="privateChatStatus">онлайн</div>
-                </div>
-                <div class="room-actions">
-                    <button class="theme-btn">⚙️</button>
-                    <span class="close">&times;</span>
-                </div>
-            </div>
-            <div class="chat-messages" id="privateChatMessages" style="flex: 1; padding: 15px;">
-                <!-- Хажуу чатын мессежүүд -->
-            </div>
-            <div class="input-container">
-                <div class="textarea-wrapper">
-                    <textarea id="privateMessageInput" placeholder="Энд мессежээ бичнэ үү..." rows="1"></textarea>
-                </div>
-                <div class="input-actions">
-                    <button id="sendPrivateMessageBtn" class="send-btn">Илгээх</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Өрөөнд нэгдэх цонх -->
-    <div id="joinRoomModal" class="modal">
-        <div class="modal-content glass" style="max-width: 600px; height: 80vh; display: flex; flex-direction: column;">
-            <div class="chat-room-header">
-                <div class="room-info">
-                    <h3 id="joinRoomTitle">Өрөө</h3>
-                    <span class="member-count" id="joinRoomMemberCount">0</span>
-                </div>
-                <div class="room-actions">
-                    <button class="theme-btn" id="roomSettingsBtn">⚙️</button>
-                    <span class="close">&times;</span>
-                </div>
-            </div>
-            <div class="chat-messages" id="roomChatMessages" style="flex: 1; padding: 15px;">
-                <!-- Өрөөний чатын мессежүүд -->
-            </div>
-            <div class="input-container">
-                <div class="textarea-wrapper">
-                    <textarea id="roomMessageInput" placeholder="Өрөөнд мессеж бичих..." rows="1"></textarea>
-                </div>
-                <div class="input-actions">
-                    <button id="sendRoomMessageBtn" class="send-btn">Илгээх</button>
-                </div>
             </div>
         </div>
     </div>
@@ -1915,8 +2020,6 @@
         const roomsModal = document.getElementById('roomsModal');
         const createRoomModal = document.getElementById('createRoomModal');
         const friendsModal = document.getElementById('friendsModal');
-        const privateChatModal = document.getElementById('privateChatModal');
-        const joinRoomModal = document.getElementById('joinRoomModal');
         const roomsList = document.getElementById('roomsList');
         const friendsList = document.getElementById('friendsList');
         const createRoomConfirmBtn = document.getElementById('createRoomConfirmBtn');
@@ -1925,19 +2028,25 @@
         const roomDescriptionInput = document.getElementById('roomDescriptionInput');
         const friendSearchInput = document.getElementById('friendSearchInput');
         const searchFriendBtn = document.getElementById('searchFriendBtn');
-        const privateChatMessages = document.getElementById('privateChatMessages');
-        const privateMessageInput = document.getElementById('privateMessageInput');
-        const sendPrivateMessageBtn = document.getElementById('sendPrivateMessageBtn');
-        const roomChatMessages = document.getElementById('roomChatMessages');
-        const roomMessageInput = document.getElementById('roomMessageInput');
-        const sendRoomMessageBtn = document.getElementById('sendRoomMessageBtn');
-        const privateChatAvatar = document.getElementById('privateChatAvatar');
-        const privateChatFriendName = document.getElementById('privateChatFriendName');
-        const privateChatStatus = document.getElementById('privateChatStatus');
-        const joinRoomTitle = document.getElementById('joinRoomTitle');
-        const joinRoomMemberCount = document.getElementById('joinRoomMemberCount');
         const activeUsersElement = document.getElementById('activeUsers');
         const roomCountElement = document.getElementById('roomCount');
+
+        // Full Screen Chat Elements
+        const privateChatFullscreen = document.getElementById('privateChatFullscreen');
+        const roomChatFullscreen = document.getElementById('roomChatFullscreen');
+        const backToAiFromPrivate = document.getElementById('backToAiFromPrivate');
+        const backToAiFromRoom = document.getElementById('backToAiFromRoom');
+        const fullscreenPrivateChatAvatar = document.getElementById('fullscreenPrivateChatAvatar');
+        const fullscreenPrivateChatFriendName = document.getElementById('fullscreenPrivateChatFriendName');
+        const fullscreenPrivateChatStatus = document.getElementById('fullscreenPrivateChatStatus');
+        const fullscreenPrivateChatMessages = document.getElementById('fullscreenPrivateChatMessages');
+        const fullscreenPrivateMessageInput = document.getElementById('fullscreenPrivateMessageInput');
+        const fullscreenSendPrivateMessageBtn = document.getElementById('fullscreenSendPrivateMessageBtn');
+        const fullscreenRoomTitle = document.getElementById('fullscreenRoomTitle');
+        const fullscreenRoomMemberCount = document.getElementById('fullscreenRoomMemberCount');
+        const fullscreenRoomChatMessages = document.getElementById('fullscreenRoomChatMessages');
+        const fullscreenRoomMessageInput = document.getElementById('fullscreenRoomMessageInput');
+        const fullscreenSendRoomMessageBtn = document.getElementById('fullscreenSendRoomMessageBtn');
 
         // =============================================
         // Firebase Authentication
@@ -2489,31 +2598,42 @@
             createRoomConfirmBtn.addEventListener('click', createNewRoom);
             searchFriendBtn.addEventListener('click', searchFriends);
             
-            // Chat functionality
-            sendPrivateMessageBtn.addEventListener('click', sendPrivateMessage);
-            sendRoomMessageBtn.addEventListener('click', sendRoomMessage);
+            // Full screen chat buttons
+            backToAiFromPrivate.addEventListener('click', () => {
+                privateChatFullscreen.classList.remove('active');
+                appContainer.style.display = 'flex';
+            });
+            
+            backToAiFromRoom.addEventListener('click', () => {
+                roomChatFullscreen.classList.remove('active');
+                appContainer.style.display = 'flex';
+            });
+            
+            // Full screen chat functionality
+            fullscreenSendPrivateMessageBtn.addEventListener('click', sendFullscreenPrivateMessage);
+            fullscreenSendRoomMessageBtn.addEventListener('click', sendFullscreenRoomMessage);
             
             // Input enter key listeners
-            privateMessageInput.addEventListener('keypress', function(e) {
+            fullscreenPrivateMessageInput.addEventListener('keypress', function(e) {
                 if (e.key === 'Enter' && !e.shiftKey) {
                     e.preventDefault();
-                    sendPrivateMessage();
+                    sendFullscreenPrivateMessage();
                 }
             });
             
-            roomMessageInput.addEventListener('keypress', function(e) {
+            fullscreenRoomMessageInput.addEventListener('keypress', function(e) {
                 if (e.key === 'Enter' && !e.shiftKey) {
                     e.preventDefault();
-                    sendRoomMessage();
+                    sendFullscreenRoomMessage();
                 }
             });
             
             // Auto-grow textareas
-            privateMessageInput.addEventListener('input', function() {
+            fullscreenPrivateMessageInput.addEventListener('input', function() {
                 autoGrowTextarea(this);
             });
             
-            roomMessageInput.addEventListener('input', function() {
+            fullscreenRoomMessageInput.addEventListener('input', function() {
                 autoGrowTextarea(this);
             });
         }
@@ -2612,17 +2732,19 @@
             socialState.currentRoom = room;
             roomsModal.classList.remove('active');
             
-            joinRoomTitle.textContent = room.name;
-            joinRoomMemberCount.textContent = room.members.length;
+            fullscreenRoomTitle.textContent = room.name;
+            fullscreenRoomMemberCount.textContent = room.members.length;
             
             // Clear previous messages
-            roomChatMessages.innerHTML = '';
+            fullscreenRoomChatMessages.innerHTML = '';
             
             // Add welcome message
-            addRoomSystemMessage(`Та "${room.name}" өрөөнд нэгдлээ!`);
+            addFullscreenRoomSystemMessage(`Та "${room.name}" өрөөнд нэгдлээ!`);
             
-            joinRoomModal.classList.add('active');
-            roomMessageInput.focus();
+            // Show full screen chat
+            appContainer.style.display = 'none';
+            roomChatFullscreen.classList.add('active');
+            fullscreenRoomMessageInput.focus();
         }
 
         // Start Private Chat
@@ -2630,29 +2752,31 @@
             socialState.currentPrivateChat = friend;
             friendsModal.classList.remove('active');
             
-            privateChatFriendName.textContent = friend.name;
-            privateChatAvatar.textContent = friend.avatar;
-            privateChatStatus.textContent = getStatusText(friend.status);
-            privateChatStatus.className = `friend-status ${friend.status}`;
+            fullscreenPrivateChatFriendName.textContent = friend.name;
+            fullscreenPrivateChatAvatar.textContent = friend.avatar;
+            fullscreenPrivateChatStatus.textContent = getStatusText(friend.status);
+            fullscreenPrivateChatStatus.className = `friend-status ${friend.status}`;
             
             // Clear previous messages
-            privateChatMessages.innerHTML = '';
+            fullscreenPrivateChatMessages.innerHTML = '';
             
             // Add welcome message
-            addPrivateSystemMessage(`Та ${friend.name}-тай хажуу чатад нэгдлээ`);
+            addFullscreenPrivateSystemMessage(`Та ${friend.name}-тай хажуу чатад нэгдлээ`);
             
-            privateChatModal.classList.add('active');
-            privateMessageInput.focus();
+            // Show full screen chat
+            appContainer.style.display = 'none';
+            privateChatFullscreen.classList.add('active');
+            fullscreenPrivateMessageInput.focus();
         }
 
-        // Send Private Message
-        function sendPrivateMessage() {
-            const message = privateMessageInput.value.trim();
+        // Send Fullscreen Private Message
+        function sendFullscreenPrivateMessage() {
+            const message = fullscreenPrivateMessageInput.value.trim();
             if (!message || !socialState.currentPrivateChat) return;
             
-            addPrivateMessage(message, true);
-            privateMessageInput.value = '';
-            autoGrowTextarea(privateMessageInput);
+            addFullscreenPrivateMessage(message, true);
+            fullscreenPrivateMessageInput.value = '';
+            autoGrowTextarea(fullscreenPrivateMessageInput);
             
             // Simulate friend response after delay
             setTimeout(() => {
@@ -2664,18 +2788,18 @@
                     "Дараа ярилцая!"
                 ];
                 const randomResponse = responses[Math.floor(Math.random() * responses.length)];
-                addPrivateMessage(randomResponse, false);
+                addFullscreenPrivateMessage(randomResponse, false);
             }, 1000 + Math.random() * 2000);
         }
 
-        // Send Room Message
-        function sendRoomMessage() {
-            const message = roomMessageInput.value.trim();
+        // Send Fullscreen Room Message
+        function sendFullscreenRoomMessage() {
+            const message = fullscreenRoomMessageInput.value.trim();
             if (!message || !socialState.currentRoom) return;
             
-            addRoomMessage(message, true);
-            roomMessageInput.value = '';
-            autoGrowTextarea(roomMessageInput);
+            addFullscreenRoomMessage(message, true);
+            fullscreenRoomMessageInput.value = '';
+            autoGrowTextarea(fullscreenRoomMessageInput);
             
             // Simulate other users responding
             if (Math.random() > 0.7) {
@@ -2689,13 +2813,13 @@
                         "Би ч мөн адил бодож байна."
                     ];
                     const randomResponse = responses[Math.floor(Math.random() * responses.length)];
-                    addRoomMessage(randomResponse, false, randomUser);
+                    addFullscreenRoomMessage(randomResponse, false, randomUser);
                 }, 2000 + Math.random() * 3000);
             }
         }
 
-        // Add Private Message
-        function addPrivateMessage(message, isOwn = false, senderName = null) {
+        // Add Fullscreen Private Message
+        function addFullscreenPrivateMessage(message, isOwn = false, senderName = null) {
             const messageElement = document.createElement('div');
             messageElement.classList.add('message', isOwn ? 'user-message' : 'social-message');
             
@@ -2715,12 +2839,12 @@
                 `;
             }
             
-            privateChatMessages.appendChild(messageElement);
-            privateChatMessages.scrollTop = privateChatMessages.scrollHeight;
+            fullscreenPrivateChatMessages.appendChild(messageElement);
+            fullscreenPrivateChatMessages.scrollTop = fullscreenPrivateChatMessages.scrollHeight;
         }
 
-        // Add Room Message
-        function addRoomMessage(message, isOwn = false, senderName = 'Хэрэглэгч') {
+        // Add Fullscreen Room Message
+        function addFullscreenRoomMessage(message, isOwn = false, senderName = 'Хэрэглэгч') {
             const messageElement = document.createElement('div');
             messageElement.classList.add('message', isOwn ? 'user-message' : 'social-message');
             
@@ -2740,32 +2864,32 @@
                 `;
             }
             
-            roomChatMessages.appendChild(messageElement);
-            roomChatMessages.scrollTop = roomChatMessages.scrollHeight;
+            fullscreenRoomChatMessages.appendChild(messageElement);
+            fullscreenRoomChatMessages.scrollTop = fullscreenRoomChatMessages.scrollHeight;
         }
 
-        // Add System Message to Private Chat
-        function addPrivateSystemMessage(message) {
+        // Add System Message to Fullscreen Private Chat
+        function addFullscreenPrivateSystemMessage(message) {
             const messageElement = document.createElement('div');
             messageElement.classList.add('message', 'system-message');
             messageElement.innerHTML = `
                 <div class="message-content">${formatMessage(message)}</div>
                 <div class="message-info">⚙️ Систем · ${getCurrentTime()}</div>
             `;
-            privateChatMessages.appendChild(messageElement);
-            privateChatMessages.scrollTop = privateChatMessages.scrollHeight;
+            fullscreenPrivateChatMessages.appendChild(messageElement);
+            fullscreenPrivateChatMessages.scrollTop = fullscreenPrivateChatMessages.scrollHeight;
         }
 
-        // Add System Message to Room Chat
-        function addRoomSystemMessage(message) {
+        // Add System Message to Fullscreen Room Chat
+        function addFullscreenRoomSystemMessage(message) {
             const messageElement = document.createElement('div');
             messageElement.classList.add('message', 'system-message');
             messageElement.innerHTML = `
                 <div class="message-content">${formatMessage(message)}</div>
                 <div class="message-info">⚙️ Систем · ${getCurrentTime()}</div>
             `;
-            roomChatMessages.appendChild(messageElement);
-            roomChatMessages.scrollTop = roomChatMessages.scrollHeight;
+            fullscreenRoomChatMessages.appendChild(messageElement);
+            fullscreenRoomChatMessages.scrollTop = fullscreenRoomChatMessages.scrollHeight;
         }
 
         // Utility Functions for Social Features
@@ -2894,12 +3018,6 @@
             }
             if (e.target === friendsModal) {
                 friendsModal.classList.remove('active');
-            }
-            if (e.target === privateChatModal) {
-                privateChatModal.classList.remove('active');
-            }
-            if (e.target === joinRoomModal) {
-                joinRoomModal.classList.remove('active');
             }
         });
 
