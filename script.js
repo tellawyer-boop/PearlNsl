@@ -4,7 +4,7 @@
 const firebaseConfig = {
     apiKey: "AIzaSyAgq5jgH4wXaF67rAgbSEyCUAnl5LEJW_0",
     authDomain: "pearlnsl.firebaseapp.com",
-    databaseURL: "https://pearlnsl-default-rtdb.firebaseio.com",
+    databaseURL: "https://pearlnsl-default-rtdb.asia-southeast1.firebasedatabase.app",
     projectId: "pearlnsl",
     storageBucket: "pearlnsl.firebasestorage.app",
     messagingSenderId: "444781972571",
@@ -1271,3 +1271,4 @@ answerInput.addEventListener('keypress', (e) => {
         e.preventDefault();
     }
 });
+
