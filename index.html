@@ -11,8 +11,10 @@
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
     
     <style>
+        /* Бүх CSS стиллүүд ижил хэвээр байна */
         /* Үндсэн стиллүүд */
         * {
             margin: 0;
@@ -1884,7 +1886,7 @@
 
     <script>
         // =============================================
-        // Firebase Configuration
+        // Firebase Configuration - ЗАССАН
         // =============================================
         const firebaseConfig = {
             apiKey: "AIzaSyAgq5jgH4wXaF67rAgbSEyCUAnl5LEJW_0",
@@ -1896,11 +1898,17 @@
             appId: "1:444781972571:web:c7875ad9be48bc1f14c37e"
         };
 
-        // Firebase инициализаци
-        firebase.initializeApp(firebaseConfig);
+        // Firebase инициализаци - ЗАССАН
+        try {
+            firebase.initializeApp(firebaseConfig);
+            console.log('Firebase инициализаци амжилттай');
+        } catch (error) {
+            console.error('Firebase инициализаци алдаа:', error);
+        }
+
         const auth = firebase.auth();
-        const = firebase.firestore();
-        const = firebase.database();
+        const firestore = firebase.firestore(); // Firestore-д зориулсан
+        const database = firebase.database(); // Realtime Database-д зориулсан - ЗАССАН
 
         // =============================================
         // Application State
@@ -1939,7 +1947,7 @@
         };
 
         // =============================================
-        // Firestore Knowledge Management
+        // Firestore Knowledge Management - ЗАССАН
         // =============================================
 
         // Мэдлэгийн сан авах
@@ -1948,7 +1956,7 @@
             
             try {
                 console.log('Firestore-оос мэдлэг авах...', currentUser.uid);
-                const doc = await db.collection('knowledge').doc(currentUser.uid).get();
+                const doc = await firestore.collection('knowledge').doc(currentUser.uid).get();
                 if (doc.exists) {
                     const userKnowledge = doc.data();
                     knowledgeCount = Object.keys(userKnowledge).length;
@@ -1957,7 +1965,7 @@
                 } else {
                     // Шинэ хэрэглэгчид анхны мэдлэг үүсгэх
                     console.log('Шинэ мэдлэг үүсгэж байна...');
-                    await db.collection('knowledge').doc(currentUser.uid).set(defaultKnowledge);
+                    await firestore.collection('knowledge').doc(currentUser.uid).set(defaultKnowledge);
                     knowledgeCount = Object.keys(defaultKnowledge).length;
                     return defaultKnowledge;
                 }
@@ -1974,7 +1982,7 @@
             
             try {
                 console.log('Firestore-д хадгалах...', knowledge);
-                await db.collection('knowledge').doc(currentUser.uid).set(knowledge);
+                await firestore.collection('knowledge').doc(currentUser.uid).set(knowledge);
                 knowledgeCount = Object.keys(knowledge).length;
                 updateStats();
                 console.log('Мэдлэг амжилттай хадгалагдлаа');
@@ -2051,34 +2059,36 @@
         const fullscreenSendRoomMessageBtn = document.getElementById('fullscreenSendRoomMessageBtn');
 
         // =============================================
-        // Firebase Authentication
+        // Firebase Authentication - ШИНЭЧЛЭГДСЭН
         // =============================================
-        googleLoginBtn.addEventListener('click', () => {
+        googleLoginBtn.addEventListener('click', async () => {
             const provider = new firebase.auth.GoogleAuthProvider();
             
-            auth.signInWithPopup(provider)
-                .then((result) => {
-                    const user = result.user;
-                    handleSuccessfulLogin(user);
-                })
-                .catch((error) => {
-                    console.error('Нэвтрэх алдаа:', error);
-                    alert('Нэвтрэхэд алдаа гарлаа: ' + error.message);
-                });
+            try {
+                console.log('Google нэвтрэлт эхэллээ...');
+                const result = await auth.signInWithPopup(provider);
+                const user = result.user;
+                console.log('Амжилттай нэвтэрлээ:', user);
+                await handleSuccessfulLogin(user);
+            } catch (error) {
+                console.error('Нэвтрэх алдаа:', error);
+                let errorMessage = 'Нэвтрэхэд алдаа гарлаа: ';
+                
+                if (error.code === 'auth/popup-blocked') {
+                    errorMessage += 'Popup блоклогдсон. Browser-ийн popup блоклохыг хасна уу.';
+                } else if (error.code === 'auth/popup-closed-by-user') {
+                    errorMessage += 'Та popup цонхыг хаасан.';
+                } else {
+                    errorMessage += error.message;
+                }
+                
+                alert(errorMessage);
+            }
         });
 
-        logoutBtn.addEventListener('click', () => {
-            auth.signOut()
-                .then(() => {
-                    console.log('Амжилттай гарлаа');
-                    handleLogout();
-                })
-                .catch((error) => {
-                    console.error('Гарах алдаа:', error);
-                });
-        });
-
+        // Auth state listener
         auth.onAuthStateChanged((user) => {
+            console.log('Auth state өөрчлөгдлөө:', user);
             if (user) {
                 handleSuccessfulLogin(user);
             } else {
@@ -2086,42 +2096,48 @@
             }
         });
 
-        // Амжилттай нэвтрэх
+        // Амжилттай нэвтрэх - ШИНЭЧЛЭГДСЭН
         async function handleSuccessfulLogin(user) {
-            currentUser = {
-                uid: user.uid,
-                email: user.email,
-                displayName: user.displayName || user.email.split('@')[0],
-                photoURL: user.photoURL
-            };
-            
-            isLoggedIn = true;
-            
-            // Firestore-оос мэдлэг авах
             try {
+                console.log('handleSuccessfulLogin функц дуудагдав:', user);
+                
+                currentUser = {
+                    uid: user.uid,
+                    email: user.email,
+                    displayName: user.displayName || user.email.split('@')[0],
+                    photoURL: user.photoURL
+                };
+                
+                isLoggedIn = true;
+                
+                // Firestore-оос мэдлэг авах
+                console.log('Мэдлэгийн сан авах эхэллээ...');
                 knowledgeBase = await getKnowledgeBase();
+                
+                // UI шинэчлэх
+                loginModal.classList.remove('active');
+                appContainer.style.display = 'flex';
+                
+                userDisplayName.textContent = currentUser.displayName;
+                
+                if (currentUser.photoURL) {
+                    userAvatar.src = currentUser.photoURL;
+                    userAvatar.style.display = 'block';
+                }
+                
+                addSystemMessage(`⚪ ${currentUser.displayName} ⚪ тавтай морил!\n\nЭнэхүү систем нь Монгол улсын хиймэл оюун ухаант төрийн системлүү чиглүүлсэн demo хувилбар юм.\nБаруун талын хөнгөвчлөх товчнуудыг ашиглаж ерөнхий мэдээллийг авна уу!`);
+                
+                // Initialize social features
+                initializeSocialFeatures();
+                
+                messageInput.focus();
+                updateStats();
+                
+                console.log('Нэвтрэлт амжилттай дууслаа');
             } catch (error) {
-                console.error('Мэдлэг авахад алдаа:', error);
-                knowledgeBase = { ...defaultKnowledge };
+                console.error('Нэвтрэлтийн үйл явцад алдаа:', error);
+                alert('Нэвтрэлтийн үйл явцад алдаа гарлаа: ' + error.message);
             }
-            
-            loginModal.classList.remove('active');
-            appContainer.style.display = 'flex';
-            
-            userDisplayName.textContent = currentUser.displayName;
-            
-            if (currentUser.photoURL) {
-                userAvatar.src = currentUser.photoURL;
-                userAvatar.style.display = 'block';
-            }
-            
-            addSystemMessage(`⚪ ${currentUser.displayName} ⚪ тавтай морил!\n\nЭнэхүү систем нь Монгол улсын хиймэл оюун ухаант төрийн системлүү чиглүүлсэн demo хувилбар юм.\nБаруун талын хөнгөвчлөх товчнуудыг ашиглаж ерөнхий мэдээллийг авна уу!`);
-            
-            // Initialize social features
-            initializeSocialFeatures();
-            
-            messageInput.focus();
-            updateStats();
         }
 
         // Гарах
@@ -2523,7 +2539,7 @@
             updateSocialStats();
         }
 
-        // Load Sample Data (Firestore-ээр солих)
+        // Load Sample Data
         function loadSampleData() {
             // Sample rooms
             socialState.rooms = [
@@ -3051,8 +3067,3 @@
     </script>
 </body>
 </html>
-
-
-
-
-
