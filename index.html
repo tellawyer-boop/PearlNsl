@@ -1049,6 +1049,240 @@
             padding: 40px 20px;
         }
 
+        /* Social Chat Styles */
+        .social-chat-box {
+            border-radius: var(--border-radius);
+            padding: 20px;
+            margin-bottom: 0;
+        }
+
+        .chat-stats {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .chat-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .chat-btn {
+            padding: 12px 16px;
+            border: none;
+            border-radius: var(--border-radius-sm);
+            cursor: pointer;
+            transition: var(--transition);
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            text-align: left;
+        }
+
+        .chat-btn.primary {
+            background: linear-gradient(135deg, var(--primary-purple), var(--primary-pink));
+            color: white;
+        }
+
+        .chat-btn.secondary {
+            background: rgba(116, 199, 236, 0.2);
+            color: var(--primary-blue);
+            border: 1px solid rgba(116, 199, 236, 0.3);
+        }
+
+        .chat-btn.tertiary {
+            background: rgba(139, 92, 246, 0.2);
+            color: var(--primary-purple);
+            border: 1px solid rgba(139, 92, 246, 0.3);
+        }
+
+        .chat-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Social Modal Styles */
+        .social-modal {
+            max-width: 800px;
+        }
+
+        .rooms-grid, .friends-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .room-card, .friend-card {
+            background: var(--surface-light);
+            border-radius: var(--border-radius-sm);
+            padding: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: var(--transition);
+            cursor: pointer;
+        }
+
+        .room-card:hover, .friend-card:hover {
+            transform: translateY(-3px);
+            background: rgba(139, 92, 246, 0.1);
+            border-color: var(--primary-purple);
+        }
+
+        .room-header, .friend-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .room-title, .friend-name {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .room-members, .friend-status {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        .room-admin, .friend-last-seen {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+        }
+
+        .status-online {
+            color: var(--success-color);
+        }
+
+        .status-offline {
+            color: var(--text-muted);
+        }
+
+        .status-away {
+            color: var(--warning-color);
+        }
+
+        /* Chat Room Styles */
+        .chat-room-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .room-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .member-count {
+            background: var(--primary-purple);
+            color: white;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 0.8rem;
+        }
+
+        .room-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        /* Friend Search */
+        .friend-search {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        #friendSearchInput {
+            flex: 1;
+            padding: 12px 16px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: var(--border-radius-sm);
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-primary);
+        }
+
+        /* Create Room Form */
+        .create-room-form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .form-row {
+            display: flex;
+            gap: 15px;
+        }
+
+        .form-row .form-group {
+            flex: 1;
+        }
+
+        /* Private Chat Styles */
+        .private-chat-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 15px 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .friend-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: var(--primary-blue);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: var(--dark-bg);
+        }
+
+        /* Social Message Styles */
+        .social-message {
+            align-self: flex-start;
+            background: var(--surface-light);
+            color: var(--text-primary);
+            border-bottom-left-radius: 8px;
+            border-left: 3px solid var(--warning-color);
+        }
+
+        .message-sender {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 5px;
+        }
+
+        .sender-avatar {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--primary-blue);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+            font-weight: bold;
+            color: var(--dark-bg);
+        }
+
+        .sender-name {
+            font-weight: 600;
+            color: var(--warning-color);
+            font-size: 0.8rem;
+        }
+
         /* Scrollbar стиллүүд */
         ::-webkit-scrollbar {
             width: 8px;
@@ -1138,6 +1372,20 @@
             
             .login-actions {
                 flex-direction: column;
+            }
+            
+            .social-chat-box {
+                margin: 10px 0;
+            }
+            
+            .chat-actions {
+                flex-direction: row;
+                flex-wrap: wrap;
+            }
+            
+            .chat-btn {
+                flex: 1;
+                min-width: 120px;
             }
         }
 
@@ -1267,9 +1515,38 @@
             </div>
 
             <div class="sidebar">
+                <!-- Social Chat Section -->
+                <div class="social-chat-box glass">
+                    <div class="chat-header">
+                        <h3>👥 Нийтийн Чат</h3>
+                        <button class="refresh-btn">🔄</button>
+                    </div>
+                    <div class="chat-stats">
+                        <div class="stat-item">
+                            <span class="stat-label">Идэвхтэй:</span>
+                            <span class="stat-value" id="activeUsers">0</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">Өрөөнүүд:</span>
+                            <span class="stat-value" id="roomCount">3</span>
+                        </div>
+                    </div>
+                    <div class="chat-actions">
+                        <button class="chat-btn primary" id="joinPublicChat">
+                            🌐 Нийтийн өрөө
+                        </button>
+                        <button class="chat-btn secondary" id="createRoomBtn">
+                            🆕 Өрөө үүсгэх
+                        </button>
+                        <button class="chat-btn tertiary" id="friendsChatBtn">
+                            👥 Хажуу чат
+                        </button>
+                    </div>
+                </div>
+
                 <div class="stats-box glass">
                     <div class="stats-header">
-                        <h3> СТАТИСТИК</h3>
+                        <h3>📊 СТАТИСТИК</h3>
                         <button class="refresh-btn">🔄</button>
                     </div>
                     <div class="stats-content">
@@ -1289,7 +1566,7 @@
                 </div>
 
                 <div class="api-config glass">
-                    <h3> API ТОХИРГОО</h3>
+                    <h3>🔑 API ТОХИРГОО</h3>
                     <div class="api-form">
                         <input type="password" id="apiKeyInput" placeholder="OpenAI API Key оруулах...">
                         <button id="saveApiKey" class="save-btn">Хадгалах</button>
@@ -1301,20 +1578,20 @@
 
                 <div class="quick-actions glass">
                     <div class="actions-header">
-                        <h3>Хурдан үйлдлүүд</h3>
+                        <h3>⚡ Хурдан үйлдлүүд</h3>
                         <div class="action-badges">
                             <span class="badge new">ШИНЭ</span>
                         </div>
                     </div>
                     <div class="quick-buttons-grid">
-                        <button class="quick-btn" data-command="чи хэн бэ"> ЧИ ХЭН БЭ?</button>
-                        <button class="quick-btn" data-command="юу хийж чадах вэ"> ЮУ ХИЙЖ ЧАДАХ ВЭ?</button>
+                        <button class="quick-btn" data-command="чи хэн бэ">🤖 ЧИ ХЭН БЭ?</button>
+                        <button class="quick-btn" data-command="юу хийж чадах вэ">💪 ЮУ ХИЙЖ ЧАДАХ ВЭ?</button>
                         <button class="quick-btn" data-command="монгол үсэг">🇲🇳 МОНГОЛ ҮСЭГ</button>
-                        <button class="quick-btn" id="addKnowledgeBtn"> МЭДЛЭГ НЭМЭХ</button>
-                        <button class="quick-btn" id="viewKnowledgeBtn"> МЭДЛЭГ ХАРАХ</button>
-                        <button class="quick-btn" id="clearChatBtn"> ЦЭВЭРЛЭХ</button>
-                        <button class="quick-btn" data-command="тусламж"> ТУСЛАМЖ</button>
-                        <button class="quick-btn" data-command="статистик"> СТАТИСТИК</button>
+                        <button class="quick-btn" id="addKnowledgeBtn">📚 МЭДЛЭГ НЭМЭХ</button>
+                        <button class="quick-btn" id="viewKnowledgeBtn">👀 МЭДЛЭГ ХАРАХ</button>
+                        <button class="quick-btn" id="clearChatBtn">🗑️ ЦЭВЭРЛЭХ</button>
+                        <button class="quick-btn" data-command="тусламж">🆘 ТУСЛАМЖ</button>
+                        <button class="quick-btn" data-command="статистик">📈 СТАТИСТИК</button>
                     </div>
                 </div>
             </div>
@@ -1325,7 +1602,7 @@
     <div id="knowledgeModal" class="modal">
         <div class="modal-content glass">
             <div class="modal-header">
-                <h2>Шинэ мэдлэг нэмэх</h2>
+                <h2>📚 Шинэ мэдлэг нэмэх</h2>
                 <span class="close">&times;</span>
             </div>
             <div class="modal-body">
@@ -1359,6 +1636,143 @@
             </div>
             <div class="modal-footer">
                 <button id="closeKnowledgeModalBtn" class="cancel-btn">Хаах</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Social Chat Modals -->
+
+    <!-- Өрөөнүүд харах цонх -->
+    <div id="roomsModal" class="modal">
+        <div class="modal-content glass social-modal">
+            <div class="modal-header">
+                <h2>👥 Миний Өрөөнүүд</h2>
+                <span class="close">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div class="rooms-grid" id="roomsList">
+                    <!-- Өрөөнүүд энд динамикаар нэмэгдэнэ -->
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="cancel-btn">Хаах</button>
+                <button id="createRoomModalBtn" class="save-btn">Шинэ Өрөө Үүсгэх</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Өрөө үүсгэх цонх -->
+    <div id="createRoomModal" class="modal">
+        <div class="modal-content glass">
+            <div class="modal-header">
+                <h2>🆕 Шинэ Өрөө Үүсгэх</h2>
+                <span class="close">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div class="create-room-form">
+                    <div class="form-group">
+                        <label for="roomNameInput">Өрөөний Нэр:</label>
+                        <input type="text" id="roomNameInput" placeholder="Өрөөний нэрээ оруулна уу">
+                    </div>
+                    <div class="form-group">
+                        <label for="roomDescriptionInput">Тайлбар:</label>
+                        <textarea id="roomDescriptionInput" placeholder="Өрөөний тайлбар" rows="3"></textarea>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="roomPrivacySelect">Нууцлал:</label>
+                            <select id="roomPrivacySelect">
+                                <option value="public">🌐 Нээлттэй</option>
+                                <option value="private">🔒 Хувийн</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="roomMaxMembers">Хамгийн их гишүүд:</label>
+                            <input type="number" id="roomMaxMembers" min="2" max="100" value="50">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="cancel-btn">Цуцлах</button>
+                <button id="createRoomConfirmBtn" class="save-btn">Үүсгэх</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Найзууд цонх -->
+    <div id="friendsModal" class="modal">
+        <div class="modal-content glass social-modal">
+            <div class="modal-header">
+                <h2>👥 Найзууд</h2>
+                <span class="close">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div class="friend-search">
+                    <input type="text" id="friendSearchInput" placeholder="Найзаа хайх...">
+                    <button id="searchFriendBtn" class="save-btn">Хайх</button>
+                </div>
+                <div class="friends-grid" id="friendsList">
+                    <!-- Найзууд энд динамикаар нэмэгдэнэ -->
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="cancel-btn">Хаах</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Хажуу чат цонх -->
+    <div id="privateChatModal" class="modal">
+        <div class="modal-content glass" style="max-width: 600px; height: 80vh; display: flex; flex-direction: column;">
+            <div class="private-chat-header">
+                <div class="friend-avatar" id="privateChatAvatar">U</div>
+                <div>
+                    <div id="privateChatFriendName">Найз</div>
+                    <div class="friend-status" id="privateChatStatus">онлайн</div>
+                </div>
+                <div class="room-actions">
+                    <button class="theme-btn">⚙️</button>
+                    <span class="close">&times;</span>
+                </div>
+            </div>
+            <div class="chat-messages" id="privateChatMessages" style="flex: 1; padding: 15px;">
+                <!-- Хажуу чатын мессежүүд -->
+            </div>
+            <div class="input-container">
+                <div class="textarea-wrapper">
+                    <textarea id="privateMessageInput" placeholder="Энд мессежээ бичнэ үү..." rows="1"></textarea>
+                </div>
+                <div class="input-actions">
+                    <button id="sendPrivateMessageBtn" class="send-btn">Илгээх</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Өрөөнд нэгдэх цонх -->
+    <div id="joinRoomModal" class="modal">
+        <div class="modal-content glass" style="max-width: 600px; height: 80vh; display: flex; flex-direction: column;">
+            <div class="chat-room-header">
+                <div class="room-info">
+                    <h3 id="joinRoomTitle">Өрөө</h3>
+                    <span class="member-count" id="joinRoomMemberCount">0</span>
+                </div>
+                <div class="room-actions">
+                    <button class="theme-btn" id="roomSettingsBtn">⚙️</button>
+                    <span class="close">&times;</span>
+                </div>
+            </div>
+            <div class="chat-messages" id="roomChatMessages" style="flex: 1; padding: 15px;">
+                <!-- Өрөөний чатын мессежүүд -->
+            </div>
+            <div class="input-container">
+                <div class="textarea-wrapper">
+                    <textarea id="roomMessageInput" placeholder="Өрөөнд мессеж бичих..." rows="1"></textarea>
+                </div>
+                <div class="input-actions">
+                    <button id="sendRoomMessageBtn" class="send-btn">Илгээх</button>
+                </div>
             </div>
         </div>
     </div>
@@ -1407,6 +1821,15 @@
         let knowledgeCount = Object.keys(defaultKnowledge).length;
         let currentRequestController = null;
         let knowledgeBase = { ...defaultKnowledge };
+
+        // Social State
+        let socialState = {
+            rooms: [],
+            friends: [],
+            currentRoom: null,
+            currentPrivateChat: null,
+            activeUsers: 0
+        };
 
         // =============================================
         // Firestore Knowledge Management
@@ -1485,6 +1908,37 @@
         const closeKnowledgeModalBtn = document.getElementById('closeKnowledgeModalBtn');
         const cancelBtn = document.querySelector('.cancel-btn');
 
+        // Social Chat DOM Elements
+        const joinPublicChatBtn = document.getElementById('joinPublicChat');
+        const createRoomBtn = document.getElementById('createRoomBtn');
+        const friendsChatBtn = document.getElementById('friendsChatBtn');
+        const roomsModal = document.getElementById('roomsModal');
+        const createRoomModal = document.getElementById('createRoomModal');
+        const friendsModal = document.getElementById('friendsModal');
+        const privateChatModal = document.getElementById('privateChatModal');
+        const joinRoomModal = document.getElementById('joinRoomModal');
+        const roomsList = document.getElementById('roomsList');
+        const friendsList = document.getElementById('friendsList');
+        const createRoomConfirmBtn = document.getElementById('createRoomConfirmBtn');
+        const createRoomModalBtn = document.getElementById('createRoomModalBtn');
+        const roomNameInput = document.getElementById('roomNameInput');
+        const roomDescriptionInput = document.getElementById('roomDescriptionInput');
+        const friendSearchInput = document.getElementById('friendSearchInput');
+        const searchFriendBtn = document.getElementById('searchFriendBtn');
+        const privateChatMessages = document.getElementById('privateChatMessages');
+        const privateMessageInput = document.getElementById('privateMessageInput');
+        const sendPrivateMessageBtn = document.getElementById('sendPrivateMessageBtn');
+        const roomChatMessages = document.getElementById('roomChatMessages');
+        const roomMessageInput = document.getElementById('roomMessageInput');
+        const sendRoomMessageBtn = document.getElementById('sendRoomMessageBtn');
+        const privateChatAvatar = document.getElementById('privateChatAvatar');
+        const privateChatFriendName = document.getElementById('privateChatFriendName');
+        const privateChatStatus = document.getElementById('privateChatStatus');
+        const joinRoomTitle = document.getElementById('joinRoomTitle');
+        const joinRoomMemberCount = document.getElementById('joinRoomMemberCount');
+        const activeUsersElement = document.getElementById('activeUsers');
+        const roomCountElement = document.getElementById('roomCount');
+
         // =============================================
         // Firebase Authentication
         // =============================================
@@ -1551,6 +2005,9 @@
             }
             
             addSystemMessage(`⚪ ${currentUser.displayName} ⚪ тавтай морил!\n\nЭнэхүү систем нь Монгол улсын хиймэл оюун ухаант төрийн системлүү чиглүүлсэн demo хувилбар юм.\nБаруун талын хөнгөвчлөх товчнуудыг ашиглаж ерөнхий мэдээллийг авна уу!`);
+            
+            // Initialize social features
+            initializeSocialFeatures();
             
             messageInput.focus();
             updateStats();
@@ -1945,6 +2402,432 @@
         }
 
         // =============================================
+        // Social Chat Functionality
+        // =============================================
+
+        // Initialize Social Features
+        function initializeSocialFeatures() {
+            loadSampleData();
+            setupSocialEventListeners();
+            updateSocialStats();
+        }
+
+        // Load Sample Data (Firestore-ээр солих)
+        function loadSampleData() {
+            // Sample rooms
+            socialState.rooms = [
+                {
+                    id: '1',
+                    name: 'Монгол Хэлний Клуб',
+                    description: 'Монгол хэлний анги',
+                    admin: currentUser?.uid,
+                    members: ['user1', 'user2'],
+                    maxMembers: 50,
+                    privacy: 'public',
+                    createdAt: new Date()
+                },
+                {
+                    id: '2', 
+                    name: 'AI Хөгжүүлэгчид',
+                    description: 'AI технологийн хөгжүүлэгчид',
+                    admin: 'user2',
+                    members: ['user2', 'user3'],
+                    maxMembers: 30,
+                    privacy: 'public',
+                    createdAt: new Date()
+                },
+                {
+                    id: '3',
+                    name: 'Гишүүдийн Өрөө',
+                    description: 'Зөвхөн урилгаар',
+                    admin: 'user3',
+                    members: ['user3'],
+                    maxMembers: 10,
+                    privacy: 'private',
+                    createdAt: new Date()
+                }
+            ];
+
+            // Sample friends
+            socialState.friends = [
+                {
+                    id: 'friend1',
+                    name: 'Бат',
+                    email: 'bat@example.com',
+                    status: 'online',
+                    lastSeen: new Date(),
+                    avatar: 'Б'
+                },
+                {
+                    id: 'friend2',
+                    name: 'Сараа',
+                    email: 'saraa@example.com',
+                    status: 'away',
+                    lastSeen: new Date(Date.now() - 300000),
+                    avatar: 'С'
+                },
+                {
+                    id: 'friend3',
+                    name: 'Тэмүүлэн',
+                    email: 'temuulen@example.com',
+                    status: 'offline',
+                    lastSeen: new Date(Date.now() - 3600000),
+                    avatar: 'Т'
+                }
+            ];
+        }
+
+        // Setup Event Listeners for Social Features
+        function setupSocialEventListeners() {
+            // Social buttons
+            joinPublicChatBtn.addEventListener('click', showRoomsModal);
+            createRoomBtn.addEventListener('click', showCreateRoomModal);
+            friendsChatBtn.addEventListener('click', showFriendsModal);
+            
+            // Modal buttons
+            createRoomModalBtn.addEventListener('click', showCreateRoomModal);
+            createRoomConfirmBtn.addEventListener('click', createNewRoom);
+            searchFriendBtn.addEventListener('click', searchFriends);
+            
+            // Chat functionality
+            sendPrivateMessageBtn.addEventListener('click', sendPrivateMessage);
+            sendRoomMessageBtn.addEventListener('click', sendRoomMessage);
+            
+            // Input enter key listeners
+            privateMessageInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    sendPrivateMessage();
+                }
+            });
+            
+            roomMessageInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    sendRoomMessage();
+                }
+            });
+            
+            // Auto-grow textareas
+            privateMessageInput.addEventListener('input', function() {
+                autoGrowTextarea(this);
+            });
+            
+            roomMessageInput.addEventListener('input', function() {
+                autoGrowTextarea(this);
+            });
+        }
+
+        // Show Rooms Modal
+        function showRoomsModal() {
+            renderRoomsList();
+            roomsModal.classList.add('active');
+        }
+
+        // Show Create Room Modal
+        function showCreateRoomModal() {
+            roomsModal.classList.remove('active');
+            createRoomModal.classList.add('active');
+        }
+
+        // Show Friends Modal
+        function showFriendsModal() {
+            renderFriendsList();
+            friendsModal.classList.add('active');
+        }
+
+        // Render Rooms List
+        function renderRoomsList() {
+            roomsList.innerHTML = '';
+            
+            socialState.rooms.forEach(room => {
+                const roomCard = document.createElement('div');
+                roomCard.className = 'room-card';
+                roomCard.innerHTML = `
+                    <div class="room-header">
+                        <div class="room-title">${room.name}</div>
+                        <div class="room-members">${room.members.length}/${room.maxMembers}</div>
+                    </div>
+                    <div class="room-description">${room.description}</div>
+                    <div class="room-admin">${room.privacy === 'public' ? '🌐 Нээлттэй' : '🔒 Хувийн'}</div>
+                `;
+                roomCard.addEventListener('click', () => joinRoom(room));
+                roomsList.appendChild(roomCard);
+            });
+        }
+
+        // Render Friends List
+        function renderFriendsList() {
+            friendsList.innerHTML = '';
+            
+            socialState.friends.forEach(friend => {
+                const friendCard = document.createElement('div');
+                friendCard.className = 'friend-card';
+                friendCard.innerHTML = `
+                    <div class="friend-header">
+                        <div class="friend-name">${friend.name}</div>
+                        <div class="friend-status ${friend.status}">${getStatusText(friend.status)}</div>
+                    </div>
+                    <div class="friend-last-seen">Сүүлд орсон: ${formatLastSeen(friend.lastSeen)}</div>
+                `;
+                friendCard.addEventListener('click', () => startPrivateChat(friend));
+                friendsList.appendChild(friendCard);
+            });
+        }
+
+        // Create New Room
+        function createNewRoom() {
+            const name = roomNameInput.value.trim();
+            const description = roomDescriptionInput.value.trim();
+            const privacy = document.getElementById('roomPrivacySelect').value;
+            const maxMembers = parseInt(document.getElementById('roomMaxMembers').value);
+            
+            if (!name) {
+                alert('Өрөөний нэрийг оруулна уу');
+                return;
+            }
+            
+            const newRoom = {
+                id: generateId(),
+                name: name,
+                description: description,
+                admin: currentUser.uid,
+                members: [currentUser.uid],
+                maxMembers: maxMembers,
+                privacy: privacy,
+                createdAt: new Date()
+            };
+            
+            socialState.rooms.push(newRoom);
+            createRoomModal.classList.remove('active');
+            roomNameInput.value = '';
+            roomDescriptionInput.value = '';
+            
+            addSystemMessage(`✅ "${name}" өрөө амжилттай үүслээ!`);
+            showRoomsModal();
+        }
+
+        // Join Room
+        function joinRoom(room) {
+            socialState.currentRoom = room;
+            roomsModal.classList.remove('active');
+            
+            joinRoomTitle.textContent = room.name;
+            joinRoomMemberCount.textContent = room.members.length;
+            
+            // Clear previous messages
+            roomChatMessages.innerHTML = '';
+            
+            // Add welcome message
+            addRoomSystemMessage(`Та "${room.name}" өрөөнд нэгдлээ!`);
+            
+            joinRoomModal.classList.add('active');
+            roomMessageInput.focus();
+        }
+
+        // Start Private Chat
+        function startPrivateChat(friend) {
+            socialState.currentPrivateChat = friend;
+            friendsModal.classList.remove('active');
+            
+            privateChatFriendName.textContent = friend.name;
+            privateChatAvatar.textContent = friend.avatar;
+            privateChatStatus.textContent = getStatusText(friend.status);
+            privateChatStatus.className = `friend-status ${friend.status}`;
+            
+            // Clear previous messages
+            privateChatMessages.innerHTML = '';
+            
+            // Add welcome message
+            addPrivateSystemMessage(`Та ${friend.name}-тай хажуу чатад нэгдлээ`);
+            
+            privateChatModal.classList.add('active');
+            privateMessageInput.focus();
+        }
+
+        // Send Private Message
+        function sendPrivateMessage() {
+            const message = privateMessageInput.value.trim();
+            if (!message || !socialState.currentPrivateChat) return;
+            
+            addPrivateMessage(message, true);
+            privateMessageInput.value = '';
+            autoGrowTextarea(privateMessageInput);
+            
+            // Simulate friend response after delay
+            setTimeout(() => {
+                const responses = [
+                    "Сайн байна уу!",
+                    "Ямар сонин сайн байна?",
+                    "Баярлалаа!",
+                    "Хөгжилтэй байна шүү!",
+                    "Дараа ярилцая!"
+                ];
+                const randomResponse = responses[Math.floor(Math.random() * responses.length)];
+                addPrivateMessage(randomResponse, false);
+            }, 1000 + Math.random() * 2000);
+        }
+
+        // Send Room Message
+        function sendRoomMessage() {
+            const message = roomMessageInput.value.trim();
+            if (!message || !socialState.currentRoom) return;
+            
+            addRoomMessage(message, true);
+            roomMessageInput.value = '';
+            autoGrowTextarea(roomMessageInput);
+            
+            // Simulate other users responding
+            if (Math.random() > 0.7) {
+                setTimeout(() => {
+                    const users = ['Бат', 'Сараа', 'Тэмүүлэн', 'Гэрэл'];
+                    const randomUser = users[Math.floor(Math.random() * users.length)];
+                    const responses = [
+                        "Сайн саналаа!",
+                        "Надад ч гэсэн ийм санаа байсан.",
+                        "Баярлалаа хуваалцсанд!",
+                        "Би ч мөн адил бодож байна."
+                    ];
+                    const randomResponse = responses[Math.floor(Math.random() * responses.length)];
+                    addRoomMessage(randomResponse, false, randomUser);
+                }, 2000 + Math.random() * 3000);
+            }
+        }
+
+        // Add Private Message
+        function addPrivateMessage(message, isOwn = false, senderName = null) {
+            const messageElement = document.createElement('div');
+            messageElement.classList.add('message', isOwn ? 'user-message' : 'social-message');
+            
+            if (!isOwn) {
+                messageElement.innerHTML = `
+                    <div class="message-sender">
+                        <div class="sender-avatar">${socialState.currentPrivateChat.avatar}</div>
+                        <div class="sender-name">${senderName || socialState.currentPrivateChat.name}</div>
+                    </div>
+                    <div class="message-content">${formatMessage(message)}</div>
+                    <div class="message-info">${getCurrentTime()}</div>
+                `;
+            } else {
+                messageElement.innerHTML = `
+                    <div class="message-content">${formatMessage(message)}</div>
+                    <div class="message-info">${getCurrentTime()}</div>
+                `;
+            }
+            
+            privateChatMessages.appendChild(messageElement);
+            privateChatMessages.scrollTop = privateChatMessages.scrollHeight;
+        }
+
+        // Add Room Message
+        function addRoomMessage(message, isOwn = false, senderName = 'Хэрэглэгч') {
+            const messageElement = document.createElement('div');
+            messageElement.classList.add('message', isOwn ? 'user-message' : 'social-message');
+            
+            if (!isOwn) {
+                messageElement.innerHTML = `
+                    <div class="message-sender">
+                        <div class="sender-avatar">${senderName.charAt(0)}</div>
+                        <div class="sender-name">${senderName}</div>
+                    </div>
+                    <div class="message-content">${formatMessage(message)}</div>
+                    <div class="message-info">${getCurrentTime()}</div>
+                `;
+            } else {
+                messageElement.innerHTML = `
+                    <div class="message-content">${formatMessage(message)}</div>
+                    <div class="message-info">${getCurrentTime()}</div>
+                `;
+            }
+            
+            roomChatMessages.appendChild(messageElement);
+            roomChatMessages.scrollTop = roomChatMessages.scrollHeight;
+        }
+
+        // Add System Message to Private Chat
+        function addPrivateSystemMessage(message) {
+            const messageElement = document.createElement('div');
+            messageElement.classList.add('message', 'system-message');
+            messageElement.innerHTML = `
+                <div class="message-content">${formatMessage(message)}</div>
+                <div class="message-info">⚙️ Систем · ${getCurrentTime()}</div>
+            `;
+            privateChatMessages.appendChild(messageElement);
+            privateChatMessages.scrollTop = privateChatMessages.scrollHeight;
+        }
+
+        // Add System Message to Room Chat
+        function addRoomSystemMessage(message) {
+            const messageElement = document.createElement('div');
+            messageElement.classList.add('message', 'system-message');
+            messageElement.innerHTML = `
+                <div class="message-content">${formatMessage(message)}</div>
+                <div class="message-info">⚙️ Систем · ${getCurrentTime()}</div>
+            `;
+            roomChatMessages.appendChild(messageElement);
+            roomChatMessages.scrollTop = roomChatMessages.scrollHeight;
+        }
+
+        // Utility Functions for Social Features
+        function generateId() {
+            return Date.now().toString(36) + Math.random().toString(36).substr(2);
+        }
+
+        function getStatusText(status) {
+            const statusMap = {
+                'online': 'онлайн',
+                'offline': 'оффлайн',
+                'away': 'завгүй'
+            };
+            return statusMap[status] || status;
+        }
+
+        function formatLastSeen(date) {
+            const now = new Date();
+            const diff = now - date;
+            const minutes = Math.floor(diff / 60000);
+            const hours = Math.floor(diff / 3600000);
+            
+            if (minutes < 1) return 'саяхан';
+            if (minutes < 60) return `${minutes} мин`;
+            if (hours < 24) return `${hours} цаг`;
+            return `${Math.floor(hours / 24)} хоног`;
+        }
+
+        function searchFriends() {
+            const query = friendSearchInput.value.toLowerCase().trim();
+            if (!query) {
+                renderFriendsList();
+                return;
+            }
+            
+            const filteredFriends = socialState.friends.filter(friend => 
+                friend.name.toLowerCase().includes(query) || 
+                friend.email.toLowerCase().includes(query)
+            );
+            
+            friendsList.innerHTML = '';
+            filteredFriends.forEach(friend => {
+                const friendCard = document.createElement('div');
+                friendCard.className = 'friend-card';
+                friendCard.innerHTML = `
+                    <div class="friend-header">
+                        <div class="friend-name">${friend.name}</div>
+                        <div class="friend-status ${friend.status}">${getStatusText(friend.status)}</div>
+                    </div>
+                    <div class="friend-last-seen">Сүүлд орсон: ${formatLastSeen(friend.lastSeen)}</div>
+                `;
+                friendCard.addEventListener('click', () => startPrivateChat(friend));
+                friendsList.appendChild(friendCard);
+            });
+        }
+
+        function updateSocialStats() {
+            activeUsersElement.textContent = socialState.friends.filter(f => f.status === 'online').length;
+            roomCountElement.textContent = socialState.rooms.length;
+        }
+
+        // =============================================
         // Event Listeners
         // =============================================
         sendButton.addEventListener('click', sendMessage);
@@ -2002,6 +2885,21 @@
             }
             if (e.target === viewKnowledgeModal) {
                 viewKnowledgeModal.classList.remove('active');
+            }
+            if (e.target === roomsModal) {
+                roomsModal.classList.remove('active');
+            }
+            if (e.target === createRoomModal) {
+                createRoomModal.classList.remove('active');
+            }
+            if (e.target === friendsModal) {
+                friendsModal.classList.remove('active');
+            }
+            if (e.target === privateChatModal) {
+                privateChatModal.classList.remove('active');
+            }
+            if (e.target === joinRoomModal) {
+                joinRoomModal.classList.remove('active');
             }
         });
 
