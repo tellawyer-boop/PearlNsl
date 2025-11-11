@@ -14,8 +14,8 @@ const firebaseConfig = {
 // Firebase инициализаци
 firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
-const db = firebase.database(); // Realtime Database
 const firestore = firebase.firestore(); // Мэдлэгийн сандаа ашиглах
+const db = firebase.database(); // Realtime Database
 
 // =============================================
 // Application State
@@ -1271,4 +1271,5 @@ answerInput.addEventListener('keypress', (e) => {
         e.preventDefault();
     }
 });
+
 
