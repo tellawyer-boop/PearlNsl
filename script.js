@@ -623,14 +623,28 @@ async function deleteKnowledge(question) {
 // =============================================
 
 // Initialize Social Features
+// Initialize Social Features - БОДИТ ӨГӨГДӨЛ АВАХ
 function initializeSocialFeatures() {
-    loadSampleData();
+    loadRealRoomsFromDatabase(); // 🔥 SAMPLE DATA БИШ, БОДИТ ӨГӨГДӨЛ
     setupSocialEventListeners();
-    setupUserStatus();
     updateSocialStats();
 }
 
-// Load Sample Data
+// 🔥 ЭНЭ ФУНКЦИЙГ НЭМЭХ - DATABASE-ЭЭС ӨРӨӨНҮҮДИЙГ АВАХ
+async function loadRealRoomsFromDatabase() {
+    try {
+        const snapshot = await database.ref('rooms').once('value');
+        const roomsData = snapshot.val();
+        if (roomsData) {
+            socialState.rooms = Object.values(roomsData);
+            roomCountElement.textContent = socialState.rooms.length;
+        }
+    } catch (error) {
+        console.error('Өрөөнүүд авахад алдаа:', error);
+        // Алдаа гарвал sample data ашиглах
+        loadSampleData();
+    }
+}
 function loadSampleData() {
     // Sample rooms
     socialState.rooms = [
@@ -803,6 +817,7 @@ function renderFriendsList() {
 }
 
 // Create New Room
+// Create New Room - БОДИТ ВЕРСИЙГ ЗАСАХ
 async function createNewRoom() {
     const name = roomNameInput.value.trim();
     const description = roomDescriptionInput.value.trim();
@@ -822,12 +837,14 @@ async function createNewRoom() {
         admin: currentUser.uid,
         maxMembers: maxMembers,
         privacy: privacy,
-        createdAt: Date.now()
+        createdAt: Date.now(),
+        members: [currentUser.uid],
+        memberCount: 1
     };
     
     try {
-        // Save to Realtime Database
-        await db.ref(`rooms/${roomId}`).set(newRoom);
+        // 🔥 ЭНД Л ДАРААХ МӨРИЙГ НЭМЭХ - DATABASE РУУ БИЧИХ
+        await database.ref(`rooms/${roomId}`).set(newRoom);
         
         // Add to social state
         socialState.rooms.push(newRoom);
@@ -840,17 +857,18 @@ async function createNewRoom() {
         showRoomsModal();
     } catch (error) {
         console.error('Өрөө үүсгэх алдаа:', error);
-        alert('Өрөө үүсгэхэд алдаа гарлаа');
+        alert('Өрөө үүсгэхэд алдаа гарлаа: ' + error.message);
     }
 }
 
 // Join Room with real-time updates
+// Join Room - БОДИТ ВЕРСИЙГ ЗАСАХ
 function joinRoom(room) {
     socialState.currentRoom = room;
     roomsModal.classList.remove('active');
     
     fullscreenRoomTitle.textContent = room.name;
-    fullscreenRoomMemberCount.textContent = '0';
+    fullscreenRoomMemberCount.textContent = room.memberCount || 1;
     
     // Clear previous messages
     fullscreenRoomChatMessages.innerHTML = '';
@@ -858,7 +876,7 @@ function joinRoom(room) {
     // Add welcome message
     addFullscreenRoomSystemMessage(`Та "${room.name}" өрөөнд нэгдлээ!`);
     
-    // Listen for real-time messages
+    // 🔥 ЭНД Л ДАРААХ МӨРИЙГ НЭМЭХ - REAL-TIME MESSAGE LISTER
     setupRoomMessageListener(room.id);
     
     // Show full screen chat
@@ -868,13 +886,14 @@ function joinRoom(room) {
 }
 
 // Setup real-time message listener for room
+// 🔥 ЭНЭ ФУНКЦИЙГ КОДОНДОО НЭМЭХ
 function setupRoomMessageListener(roomId) {
     // Clear previous listener
     if (socialState.roomMessageListener) {
         socialState.roomMessageListener();
     }
     
-    socialState.roomMessageListener = db.ref(`rooms/${roomId}/messages`)
+    socialState.roomMessageListener = database.ref(`rooms/${roomId}/messages`)
         .orderByChild('timestamp')
         .on('child_added', (snapshot) => {
             const message = snapshot.val();
@@ -886,10 +905,13 @@ function setupRoomMessageListener(roomId) {
 // Display room message
 function displayRoomMessage(message) {
     // Check if message already displayed
-    if (socialState.displayedMessages.has(message.id)) {
+    if (socialState.displayedMessages && socialState.displayedMessages.has(message.id)) {
         return;
     }
     
+    if (!socialState.displayedMessages) {
+        socialState.displayedMessages = new Set();
+    }
     socialState.displayedMessages.add(message.id);
     
     const messageElement = document.createElement('div');
@@ -918,6 +940,7 @@ function displayRoomMessage(message) {
 }
 
 // Send message to room
+// Send message to room - БОДИТ ВЕРСИЙГ ЗАСАХ
 async function sendFullscreenRoomMessage() {
     const messageText = fullscreenRoomMessageInput.value.trim();
     if (!messageText || !socialState.currentRoom) return;
@@ -931,7 +954,8 @@ async function sendFullscreenRoomMessage() {
     };
     
     try {
-        const messagesRef = db.ref(`rooms/${socialState.currentRoom.id}/messages`);
+        // 🔥 ЭНД Л ДАРААХ МӨРИЙГ НЭМЭХ - DATABASE РУУ БИЧИХ
+        const messagesRef = database.ref(`rooms/${socialState.currentRoom.id}/messages`);
         await messagesRef.push(message);
         
         fullscreenRoomMessageInput.value = '';
@@ -1271,6 +1295,7 @@ answerInput.addEventListener('keypress', (e) => {
         e.preventDefault();
     }
 });
+
 
 
 
