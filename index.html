@@ -10,11 +10,9 @@
     <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
     
     <style>
-        /* Бүх CSS стиллүүд ижил хэвээр байна */
         /* Үндсэн стиллүүд */
         * {
             margin: 0;
@@ -357,6 +355,14 @@
             padding: 15px 25px;
         }
 
+        .social-message {
+            align-self: flex-start;
+            background: var(--surface-light);
+            color: var(--text-primary);
+            border-bottom-left-radius: 8px;
+            border-left: 3px solid var(--warning-color);
+        }
+
         .message-content {
             line-height: 1.6;
             font-size: 1rem;
@@ -369,6 +375,32 @@
             display: flex;
             align-items: center;
             gap: 5px;
+        }
+
+        .message-sender {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 5px;
+        }
+
+        .sender-avatar {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--primary-blue);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+            font-weight: bold;
+            color: var(--dark-bg);
+        }
+
+        .sender-name {
+            font-weight: 600;
+            color: var(--warning-color);
+            font-size: 0.8rem;
         }
 
         /* Оролтын хэсэг */
@@ -1169,70 +1201,6 @@
             color: var(--warning-color);
         }
 
-        /* Full Screen Chat Styles */
-        .fullscreen-chat {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: var(--dark-bg);
-            z-index: 2000;
-            display: none;
-            flex-direction: column;
-        }
-
-        .fullscreen-chat.active {
-            display: flex;
-        }
-
-        .chat-header-fullscreen {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 20px 30px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            background: var(--surface-dark);
-        }
-
-        .back-to-ai {
-            padding: 10px 20px;
-            background: rgba(255, 255, 255, 0.1);
-            color: var(--text-primary);
-            border: none;
-            border-radius: var(--border-radius-sm);
-            cursor: pointer;
-            transition: var(--transition);
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-weight: 600;
-        }
-
-        .back-to-ai:hover {
-            background: rgba(255, 255, 255, 0.15);
-            transform: translateY(-2px);
-        }
-
-        .chat-messages-fullscreen {
-            flex: 1;
-            padding: 25px;
-            overflow-y: auto;
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-            background: var(--darker-bg);
-        }
-
-        .input-container-fullscreen {
-            padding: 20px;
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
-            display: flex;
-            gap: 15px;
-            align-items: flex-end;
-            background: var(--surface-dark);
-        }
-
         /* Chat Room Styles */
         .chat-room-header {
             display: flex;
@@ -1312,76 +1280,6 @@
             justify-content: center;
             font-weight: bold;
             color: var(--dark-bg);
-        }
-
-        /* Social Message Styles */
-        .social-message {
-            align-self: flex-start;
-            background: var(--surface-light);
-            color: var(--text-primary);
-            border-bottom-left-radius: 8px;
-            border-left: 3px solid var(--warning-color);
-        }
-
-        .message-sender {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            margin-bottom: 5px;
-        }
-
-        .sender-avatar {
-            width: 20px;
-            height: 20px;
-            border-radius: 50%;
-            background: var(--primary-blue);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.7rem;
-            font-weight: bold;
-            color: var(--dark-bg);
-        }
-
-        .sender-name {
-            font-weight: 600;
-            color: var(--warning-color);
-            font-size: 0.8rem;
-        }
-
-        /* Message Input Styles */
-        .message-input-wrapper {
-            flex: 1;
-            position: relative;
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: var(--border-radius);
-            padding: 15px 20px;
-            transition: var(--transition);
-        }
-
-        .message-input-wrapper:focus-within {
-            border-color: var(--primary-purple);
-            box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.2);
-        }
-
-        .message-input {
-            width: 100%;
-            min-height: 20px;
-            max-height: 120px;
-            border: none;
-            background: transparent;
-            color: var(--text-primary);
-            font-size: 1rem;
-            outline: none;
-            resize: none;
-            overflow-y: auto;
-            font-family: inherit;
-            line-height: 1.5;
-        }
-
-        .message-input::placeholder {
-            color: var(--text-muted);
         }
 
         /* Scrollbar стиллүүд */
@@ -1619,8 +1517,8 @@
                 <!-- Social Chat Section -->
                 <div class="social-chat-box glass">
                     <div class="chat-header">
-                        <h3> Нийтийн Чат</h3>
-                        <button class="refresh-btn">🔄</button>
+                        <h3>👥 Нийтийн Чат</h3>
+                        <button class="refresh-btn" id="refreshSocialBtn">🔄</button>
                     </div>
                     <div class="chat-stats">
                         <div class="stat-item">
@@ -1629,26 +1527,26 @@
                         </div>
                         <div class="stat-item">
                             <span class="stat-label">Өрөөнүүд:</span>
-                            <span class="stat-value" id="roomCount">3</span>
+                            <span class="stat-value" id="roomCount">0</span>
                         </div>
                     </div>
                     <div class="chat-actions">
                         <button class="chat-btn primary" id="joinPublicChat">
-                             Нийтийн өрөө
+                            🌐 Нийтийн өрөө
                         </button>
                         <button class="chat-btn secondary" id="createRoomBtn">
-                             Өрөө үүсгэх
+                            🆕 Өрөө үүсгэх
                         </button>
                         <button class="chat-btn tertiary" id="friendsChatBtn">
-                             Хувь чат
+                            👥 Хажуу чат
                         </button>
                     </div>
                 </div>
 
                 <div class="stats-box glass">
                     <div class="stats-header">
-                        <h3> СТАТИСТИК</h3>
-                        <button class="refresh-btn"> </button>
+                        <h3>📊 СТАТИСТИК</h3>
+                        <button class="refresh-btn" id="refreshStatsBtn">🔄</button>
                     </div>
                     <div class="stats-content">
                         <div class="stat-item">
@@ -1667,7 +1565,7 @@
                 </div>
 
                 <div class="api-config glass">
-                    <h3> API ТОХИРГОО</h3>
+                    <h3>🔑 API ТОХИРГОО</h3>
                     <div class="api-form">
                         <input type="password" id="apiKeyInput" placeholder="OpenAI API Key оруулах...">
                         <button id="saveApiKey" class="save-btn">Хадгалах</button>
@@ -1679,20 +1577,20 @@
 
                 <div class="quick-actions glass">
                     <div class="actions-header">
-                        <h3> Хурдан үйлдлүүд</h3>
+                        <h3>⚡ Хурдан үйлдлүүд</h3>
                         <div class="action-badges">
                             <span class="badge new">ШИНЭ</span>
                         </div>
                     </div>
                     <div class="quick-buttons-grid">
-                        <button class="quick-btn" data-command="чи хэн бэ"> ЧИ ХЭН БЭ?</button>
-                        <button class="quick-btn" data-command="юу хийж чадах вэ"> ЮУ ХИЙЖ ЧАДАХ ВЭ?</button>
+                        <button class="quick-btn" data-command="чи хэн бэ">🤖 ЧИ ХЭН БЭ?</button>
+                        <button class="quick-btn" data-command="юу хийж чадах вэ">💪 ЮУ ХИЙЖ ЧАДАХ ВЭ?</button>
                         <button class="quick-btn" data-command="монгол үсэг">🇲🇳 МОНГОЛ ҮСЭГ</button>
-                        <button class="quick-btn" id="addKnowledgeBtn"> МЭДЛЭГ НЭМЭХ</button>
-                        <button class="quick-btn" id="viewKnowledgeBtn"> МЭДЛЭГ ХАРАХ</button>
-                        <button class="quick-btn" id="clearChatBtn"> ЦЭВЭРЛЭХ</button>
-                        <button class="quick-btn" data-command="тусламж"> ТУСЛАМЖ</button>
-                        <button class="quick-btn" data-command="статистик"> СТАТИСТИК</button>
+                        <button class="quick-btn" id="addKnowledgeBtn">📚 МЭДЛЭГ НЭМЭХ</button>
+                        <button class="quick-btn" id="viewKnowledgeBtn">👀 МЭДЛЭГ ХАРАХ</button>
+                        <button class="quick-btn" id="clearChatBtn">🗑️ ЦЭВЭРЛЭХ</button>
+                        <button class="quick-btn" data-command="тусламж">🆘 ТУСЛАМЖ</button>
+                        <button class="quick-btn" data-command="статистик">📈 СТАТИСТИК</button>
                     </div>
                 </div>
             </div>
@@ -1703,7 +1601,7 @@
     <div id="knowledgeModal" class="modal">
         <div class="modal-content glass">
             <div class="modal-header">
-                <h2> Шинэ мэдлэг нэмэх</h2>
+                <h2>📚 Шинэ мэдлэг нэмэх</h2>
                 <span class="close">&times;</span>
             </div>
             <div class="modal-body">
@@ -1741,74 +1639,13 @@
         </div>
     </div>
 
-    <!-- Full Screen Chat Windows -->
-
-    <!-- Хажуу чат (бүтэн дэлгэц) -->
-    <div id="privateChatFullscreen" class="fullscreen-chat">
-        <div class="chat-header-fullscreen">
-            <button class="back-to-ai" id="backToAiFromPrivate">
-                ← AI чат руу буцах
-            </button>
-            <div class="room-info">
-                <div class="friend-avatar" id="fullscreenPrivateChatAvatar">U</div>
-                <div>
-                    <h3 id="fullscreenPrivateChatFriendName">Найз</h3>
-                    <div class="friend-status" id="fullscreenPrivateChatStatus">онлайн</div>
-                </div>
-            </div>
-            <div class="room-actions">
-                <button class="theme-btn"> </button>
-            </div>
-        </div>
-        <div class="chat-messages-fullscreen" id="fullscreenPrivateChatMessages">
-            <!-- Хажуу чатын мессежүүд -->
-        </div>
-        <div class="input-container-fullscreen">
-            <div class="message-input-wrapper">
-                <textarea class="message-input" id="fullscreenPrivateMessageInput" 
-                          placeholder="Энд мессежээ бичнэ үү..." rows="1"></textarea>
-            </div>
-            <div class="input-actions">
-                <button id="fullscreenSendPrivateMessageBtn" class="send-btn">Илгээх</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Өрөөний чат (бүтэн дэлгэц) -->
-    <div id="roomChatFullscreen" class="fullscreen-chat">
-        <div class="chat-header-fullscreen">
-            <button class="back-to-ai" id="backToAiFromRoom">
-                ← AI чат руу буцах
-            </button>
-            <div class="room-info">
-                <h3 id="fullscreenRoomTitle">Өрөө</h3>
-                <span class="member-count" id="fullscreenRoomMemberCount">0</span>
-            </div>
-            <div class="room-actions">
-                <button class="theme-btn" id="fullscreenRoomSettingsBtn">⚙️</button>
-            </div>
-        </div>
-        <div class="chat-messages-fullscreen" id="fullscreenRoomChatMessages">
-            <!-- Өрөөний чатын мессежүүд -->
-        </div>
-        <div class="input-container-fullscreen">
-            <div class="message-input-wrapper">
-                <textarea class="message-input" id="fullscreenRoomMessageInput" 
-                          placeholder="Энд мессежээ бичнэ үү..." rows="1"></textarea>
-            </div>
-            <div class="input-actions">
-                <button id="fullscreenSendRoomMessageBtn" class="send-btn">Илгээх</button>
-            </div>
-        </div>
-    </div>
-
     <!-- Social Chat Modals -->
 
     <!-- Өрөөнүүд харах цонх -->
     <div id="roomsModal" class="modal">
         <div class="modal-content glass social-modal">
             <div class="modal-header">
-                <h2> Миний Өрөөнүүд</h2>
+                <h2>👥 Миний Өрөөнүүд</h2>
                 <span class="close">&times;</span>
             </div>
             <div class="modal-body">
@@ -1827,7 +1664,7 @@
     <div id="createRoomModal" class="modal">
         <div class="modal-content glass">
             <div class="modal-header">
-                <h2> Шинэ Өрөө Үүсгэх</h2>
+                <h2>🆕 Шинэ Өрөө Үүсгэх</h2>
                 <span class="close">&times;</span>
             </div>
             <div class="modal-body">
@@ -1844,8 +1681,8 @@
                         <div class="form-group">
                             <label for="roomPrivacySelect">Нууцлал:</label>
                             <select id="roomPrivacySelect">
-                                <option value="public"> Нээлттэй</option>
-                                <option value="private"> Хувийн</option>
+                                <option value="public">🌐 Нээлттэй</option>
+                                <option value="private">🔒 Хувийн</option>
                             </select>
                         </div>
                         <div class="form-group">
@@ -1866,7 +1703,7 @@
     <div id="friendsModal" class="modal">
         <div class="modal-content glass social-modal">
             <div class="modal-header">
-                <h2> Найзууд</h2>
+                <h2>👥 Найзууд</h2>
                 <span class="close">&times;</span>
             </div>
             <div class="modal-body">
@@ -1884,31 +1721,79 @@
         </div>
     </div>
 
+    <!-- Хажуу чат цонх -->
+    <div id="privateChatModal" class="modal">
+        <div class="modal-content glass" style="max-width: 600px; height: 80vh; display: flex; flex-direction: column;">
+            <div class="private-chat-header">
+                <div class="friend-avatar" id="privateChatAvatar">U</div>
+                <div>
+                    <div id="privateChatFriendName">Найз</div>
+                    <div class="friend-status" id="privateChatStatus">онлайн</div>
+                </div>
+                <div class="room-actions">
+                    <button class="theme-btn">⚙️</button>
+                    <span class="close">&times;</span>
+                </div>
+            </div>
+            <div class="chat-messages" id="privateChatMessages" style="flex: 1; padding: 15px;">
+                <!-- Хажуу чатын мессежүүд -->
+            </div>
+            <div class="input-container">
+                <div class="textarea-wrapper">
+                    <textarea id="privateMessageInput" placeholder="Энд мессежээ бичнэ үү..." rows="1"></textarea>
+                </div>
+                <div class="input-actions">
+                    <button id="sendPrivateMessageBtn" class="send-btn">Илгээх</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Өрөөнд нэгдэх цонх -->
+    <div id="joinRoomModal" class="modal">
+        <div class="modal-content glass" style="max-width: 600px; height: 80vh; display: flex; flex-direction: column;">
+            <div class="chat-room-header">
+                <div class="room-info">
+                    <h3 id="joinRoomTitle">Өрөө</h3>
+                    <span class="member-count" id="joinRoomMemberCount">0</span>
+                </div>
+                <div class="room-actions">
+                    <button class="theme-btn" id="roomSettingsBtn">⚙️</button>
+                    <span class="close">&times;</span>
+                </div>
+            </div>
+            <div class="chat-messages" id="roomChatMessages" style="flex: 1; padding: 15px;">
+                <!-- Өрөөний чатын мессежүүд -->
+            </div>
+            <div class="input-container">
+                <div class="textarea-wrapper">
+                    <textarea id="roomMessageInput" placeholder="Өрөөнд мессеж бичих..." rows="1"></textarea>
+                </div>
+                <div class="input-actions">
+                    <button id="sendRoomMessageBtn" class="send-btn">Илгээх</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script>
         // =============================================
-        // Firebase Configuration - ЗАССАН
+        // Firebase Configuration
         // =============================================
         const firebaseConfig = {
             apiKey: "AIzaSyAgq5jgH4wXaF67rAgbSEyCUAnl5LEJW_0",
             authDomain: "pearlnsl.firebaseapp.com",
-            databaseURL: "https://pearlnsl-default-rtdb.asia-southeast1.firebasedatabase.app", 
+            databaseURL: "https://pearlnsl-default-rtdb.asia-southeast1.firebasedatabase.app/",
             projectId: "pearlnsl",
             storageBucket: "pearlnsl.firebasestorage.app",
             messagingSenderId: "444781972571",
             appId: "1:444781972571:web:c7875ad9be48bc1f14c37e"
         };
 
-        // Firebase инициализаци - ЗАССАН
-        try {
-            firebase.initializeApp(firebaseConfig);
-            console.log('Firebase инициализаци амжилттай');
-        } catch (error) {
-            console.error('Firebase инициализаци алдаа:', error);
-        }
-
+        // Firebase инициализаци
+        firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
-        const firestore = firebase.firestore(); // Firestore-д зориулсан
-        const database = firebase.database(); // Realtime Database-д зориулсан - ЗАССАН
+        const database = firebase.database();
 
         // =============================================
         // Application State
@@ -1943,53 +1828,221 @@
             friends: [],
             currentRoom: null,
             currentPrivateChat: null,
-            activeUsers: 0
+            activeUsers: 0,
+            onlineUsers: {}
         };
 
         // =============================================
-        // Firestore Knowledge Management - ЗАССАН
+        // Real-time Database Management
         // =============================================
 
-        // Мэдлэгийн сан авах
-        async function getKnowledgeBase() {
-            if (!currentUser) return defaultKnowledge;
-            
-            try {
-                console.log('Firestore-оос мэдлэг авах...', currentUser.uid);
-                const doc = await firestore.collection('knowledge').doc(currentUser.uid).get();
-                if (doc.exists) {
-                    const userKnowledge = doc.data();
-                    knowledgeCount = Object.keys(userKnowledge).length;
-                    console.log('Мэдлэг олдлоо:', userKnowledge);
-                    return userKnowledge;
-                } else {
-                    // Шинэ хэрэглэгчид анхны мэдлэг үүсгэх
-                    console.log('Шинэ мэдлэг үүсгэж байна...');
-                    await firestore.collection('knowledge').doc(currentUser.uid).set(defaultKnowledge);
-                    knowledgeCount = Object.keys(defaultKnowledge).length;
-                    return defaultKnowledge;
-                }
-            } catch (error) {
-                console.error('Мэдлэг авах алдаа:', error);
-                alert('Мэдлэг авахад алдаа гарлаа: ' + error.message);
-                return defaultKnowledge;
-            }
-        }
-
-        // Мэдлэг хадгалах
-        async function saveKnowledge(knowledge) {
+        // Онлайн статус тохируулах
+        function setUserOnlineStatus() {
             if (!currentUser) return;
             
-            try {
-                console.log('Firestore-д хадгалах...', knowledge);
-                await firestore.collection('knowledge').doc(currentUser.uid).set(knowledge);
-                knowledgeCount = Object.keys(knowledge).length;
-                updateStats();
-                console.log('Мэдлэг амжилттай хадгалагдлаа');
-            } catch (error) {
-                console.error('Мэдлэг хадгалах алдаа:', error);
-                alert('Мэдлэг хадгалахад алдаа гарлаа: ' + error.message);
-            }
+            const userStatusRef = database.ref('onlineUsers/' + currentUser.uid);
+            userStatusRef.set({
+                uid: currentUser.uid,
+                displayName: currentUser.displayName,
+                photoURL: currentUser.photoURL || '',
+                lastSeen: firebase.database.ServerValue.TIMESTAMP,
+                status: 'online'
+            });
+            
+            // Хэрэглэгч гарвал статусыг өөрчлөх
+            userStatusRef.onDisconnect().update({
+                status: 'offline',
+                lastSeen: firebase.database.ServerValue.TIMESTAMP
+            });
+        }
+
+        // Онлайн хэрэглэгчдийг харах
+        function listenToOnlineUsers() {
+            const onlineUsersRef = database.ref('onlineUsers');
+            onlineUsersRef.on('value', (snapshot) => {
+                const users = snapshot.val() || {};
+                socialState.onlineUsers = users;
+                socialState.activeUsers = Object.keys(users).length;
+                updateSocialStats();
+            });
+        }
+
+        // Өрөөнүүдийг харах
+        function listenToRooms() {
+            const roomsRef = database.ref('rooms');
+            roomsRef.on('value', (snapshot) => {
+                const rooms = snapshot.val() || {};
+                socialState.rooms = Object.keys(rooms).map(key => ({
+                    id: key,
+                    ...rooms[key]
+                }));
+                updateSocialStats();
+                updateRoomsList();
+            });
+        }
+
+        // Хажуу чатуудыг харах
+        function listenToPrivateChats() {
+            if (!currentUser) return;
+            
+            const privateChatsRef = database.ref('privateChats').orderByChild('participants/' + currentUser.uid).equalTo(true);
+            privateChatsRef.on('value', (snapshot) => {
+                const chats = snapshot.val() || {};
+                socialState.privateChats = Object.keys(chats).map(key => ({
+                    id: key,
+                    ...chats[key]
+                }));
+            });
+        }
+
+        // Нийтийн чатын мессежүүдийг харах
+        function listenToPublicChat() {
+            const publicChatRef = database.ref('publicChat').limitToLast(50);
+            publicChatRef.on('child_added', (snapshot) => {
+                const message = snapshot.val();
+                if (message.userId !== currentUser.uid) {
+                    addSocialMessage(message);
+                }
+            });
+        }
+
+        // Өрөөний чатын мессежүүдийг харах
+        function listenToRoomChat(roomId) {
+            const roomChatRef = database.ref('roomChats/' + roomId).limitToLast(50);
+            roomChatRef.on('child_added', (snapshot) => {
+                const message = snapshot.val();
+                if (message.userId !== currentUser.uid) {
+                    addRoomMessage(message);
+                }
+            });
+        }
+
+        // Хажуу чатын мессежүүдийг харах
+        function listenToPrivateChat(chatId) {
+            const privateChatRef = database.ref('privateChats/' + chatId + '/messages').limitToLast(50);
+            privateChatRef.on('child_added', (snapshot) => {
+                const message = snapshot.val();
+                if (message.userId !== currentUser.uid) {
+                    addPrivateMessage(message);
+                }
+            });
+        }
+
+        // =============================================
+        // Social Chat Functions
+        // =============================================
+
+        // Нийтийн чатад мессеж илгээх
+        function sendPublicMessage(message) {
+            if (!currentUser) return;
+            
+            const messageData = {
+                userId: currentUser.uid,
+                displayName: currentUser.displayName,
+                message: message,
+                timestamp: firebase.database.ServerValue.TIMESTAMP,
+                type: 'public'
+            };
+            
+            database.ref('publicChat').push(messageData);
+        }
+
+        // Өрөөний чатад мессеж илгээх
+        function sendRoomMessage(roomId, message) {
+            if (!currentUser) return;
+            
+            const messageData = {
+                userId: currentUser.uid,
+                displayName: currentUser.displayName,
+                message: message,
+                timestamp: firebase.database.ServerValue.TIMESTAMP,
+                type: 'room'
+            };
+            
+            database.ref('roomChats/' + roomId).push(messageData);
+        }
+
+        // Хажуу чатад мессеж илгээх
+        function sendPrivateMessage(chatId, message) {
+            if (!currentUser) return;
+            
+            const messageData = {
+                userId: currentUser.uid,
+                displayName: currentUser.displayName,
+                message: message,
+                timestamp: firebase.database.ServerValue.TIMESTAMP,
+                type: 'private'
+            };
+            
+            database.ref('privateChats/' + chatId + '/messages').push(messageData);
+        }
+
+        // Шинэ өрөө үүсгэх
+        function createRoom(roomData) {
+            if (!currentUser) return;
+            
+            const roomRef = database.ref('rooms').push();
+            const roomId = roomRef.key;
+            
+            const roomWithData = {
+                ...roomData,
+                id: roomId,
+                createdBy: currentUser.uid,
+                createdAt: firebase.database.ServerValue.TIMESTAMP,
+                members: {
+                    [currentUser.uid]: true
+                },
+                memberCount: 1
+            };
+            
+            roomRef.set(roomWithData);
+            return roomId;
+        }
+
+        // Өрөөнд нэгдэх
+        function joinRoom(roomId) {
+            if (!currentUser) return;
+            
+            const roomRef = database.ref('rooms/' + roomId);
+            roomRef.transaction((room) => {
+                if (room) {
+                    if (!room.members) {
+                        room.members = {};
+                    }
+                    room.members[currentUser.uid] = true;
+                    room.memberCount = Object.keys(room.members).length;
+                }
+                return room;
+            });
+        }
+
+        // Найз хайх
+        function searchUsers(query) {
+            // Энэ жишээнд бүх онлайн хэрэглэгчдийг харуулна
+            return Object.values(socialState.onlineUsers).filter(user => 
+                user.displayName.toLowerCase().includes(query.toLowerCase()) && 
+                user.uid !== currentUser.uid
+            );
+        }
+
+        // Хажуу чат үүсгэх
+        function createPrivateChat(friendId) {
+            if (!currentUser) return;
+            
+            const chatId = [currentUser.uid, friendId].sort().join('_');
+            const chatRef = database.ref('privateChats/' + chatId);
+            
+            const chatData = {
+                id: chatId,
+                participants: {
+                    [currentUser.uid]: true,
+                    [friendId]: true
+                },
+                created: firebase.database.ServerValue.TIMESTAMP
+            };
+            
+            chatRef.set(chatData);
+            return chatId;
         }
 
         // =============================================
@@ -2030,6 +2083,8 @@
         const roomsModal = document.getElementById('roomsModal');
         const createRoomModal = document.getElementById('createRoomModal');
         const friendsModal = document.getElementById('friendsModal');
+        const privateChatModal = document.getElementById('privateChatModal');
+        const joinRoomModal = document.getElementById('joinRoomModal');
         const roomsList = document.getElementById('roomsList');
         const friendsList = document.getElementById('friendsList');
         const createRoomConfirmBtn = document.getElementById('createRoomConfirmBtn');
@@ -2038,57 +2093,51 @@
         const roomDescriptionInput = document.getElementById('roomDescriptionInput');
         const friendSearchInput = document.getElementById('friendSearchInput');
         const searchFriendBtn = document.getElementById('searchFriendBtn');
+        const privateChatMessages = document.getElementById('privateChatMessages');
+        const privateMessageInput = document.getElementById('privateMessageInput');
+        const sendPrivateMessageBtn = document.getElementById('sendPrivateMessageBtn');
+        const roomChatMessages = document.getElementById('roomChatMessages');
+        const roomMessageInput = document.getElementById('roomMessageInput');
+        const sendRoomMessageBtn = document.getElementById('sendRoomMessageBtn');
+        const privateChatAvatar = document.getElementById('privateChatAvatar');
+        const privateChatFriendName = document.getElementById('privateChatFriendName');
+        const privateChatStatus = document.getElementById('privateChatStatus');
+        const joinRoomTitle = document.getElementById('joinRoomTitle');
+        const joinRoomMemberCount = document.getElementById('joinRoomMemberCount');
         const activeUsersElement = document.getElementById('activeUsers');
         const roomCountElement = document.getElementById('roomCount');
-
-        // Full Screen Chat Elements
-        const privateChatFullscreen = document.getElementById('privateChatFullscreen');
-        const roomChatFullscreen = document.getElementById('roomChatFullscreen');
-        const backToAiFromPrivate = document.getElementById('backToAiFromPrivate');
-        const backToAiFromRoom = document.getElementById('backToAiFromRoom');
-        const fullscreenPrivateChatAvatar = document.getElementById('fullscreenPrivateChatAvatar');
-        const fullscreenPrivateChatFriendName = document.getElementById('fullscreenPrivateChatFriendName');
-        const fullscreenPrivateChatStatus = document.getElementById('fullscreenPrivateChatStatus');
-        const fullscreenPrivateChatMessages = document.getElementById('fullscreenPrivateChatMessages');
-        const fullscreenPrivateMessageInput = document.getElementById('fullscreenPrivateMessageInput');
-        const fullscreenSendPrivateMessageBtn = document.getElementById('fullscreenSendPrivateMessageBtn');
-        const fullscreenRoomTitle = document.getElementById('fullscreenRoomTitle');
-        const fullscreenRoomMemberCount = document.getElementById('fullscreenRoomMemberCount');
-        const fullscreenRoomChatMessages = document.getElementById('fullscreenRoomChatMessages');
-        const fullscreenRoomMessageInput = document.getElementById('fullscreenRoomMessageInput');
-        const fullscreenSendRoomMessageBtn = document.getElementById('fullscreenSendRoomMessageBtn');
+        const refreshSocialBtn = document.getElementById('refreshSocialBtn');
+        const refreshStatsBtn = document.getElementById('refreshStatsBtn');
 
         // =============================================
-        // Firebase Authentication - ШИНЭЧЛЭГДСЭН
+        // Firebase Authentication
         // =============================================
-        googleLoginBtn.addEventListener('click', async () => {
+        googleLoginBtn.addEventListener('click', () => {
             const provider = new firebase.auth.GoogleAuthProvider();
             
-            try {
-                console.log('Google нэвтрэлт эхэллээ...');
-                const result = await auth.signInWithPopup(provider);
-                const user = result.user;
-                console.log('Амжилттай нэвтэрлээ:', user);
-                await handleSuccessfulLogin(user);
-            } catch (error) {
-                console.error('Нэвтрэх алдаа:', error);
-                let errorMessage = 'Нэвтрэхэд алдаа гарлаа: ';
-                
-                if (error.code === 'auth/popup-blocked') {
-                    errorMessage += 'Popup блоклогдсон. Browser-ийн popup блоклохыг хасна уу.';
-                } else if (error.code === 'auth/popup-closed-by-user') {
-                    errorMessage += 'Та popup цонхыг хаасан.';
-                } else {
-                    errorMessage += error.message;
-                }
-                
-                alert(errorMessage);
-            }
+            auth.signInWithPopup(provider)
+                .then((result) => {
+                    const user = result.user;
+                    handleSuccessfulLogin(user);
+                })
+                .catch((error) => {
+                    console.error('Нэвтрэх алдаа:', error);
+                    alert('Нэвтрэхэд алдаа гарлаа: ' + error.message);
+                });
         });
 
-        // Auth state listener
+        logoutBtn.addEventListener('click', () => {
+            auth.signOut()
+                .then(() => {
+                    console.log('Амжилттай гарлаа');
+                    handleLogout();
+                })
+                .catch((error) => {
+                    console.error('Гарах алдаа:', error);
+                });
+        });
+
         auth.onAuthStateChanged((user) => {
-            console.log('Auth state өөрчлөгдлөө:', user);
             if (user) {
                 handleSuccessfulLogin(user);
             } else {
@@ -2096,48 +2145,38 @@
             }
         });
 
-        // Амжилттай нэвтрэх - ШИНЭЧЛЭГДСЭН
+        // Амжилттай нэвтрэх
         async function handleSuccessfulLogin(user) {
-            try {
-                console.log('handleSuccessfulLogin функц дуудагдав:', user);
-                
-                currentUser = {
-                    uid: user.uid,
-                    email: user.email,
-                    displayName: user.displayName || user.email.split('@')[0],
-                    photoURL: user.photoURL
-                };
-                
-                isLoggedIn = true;
-                
-                // Firestore-оос мэдлэг авах
-                console.log('Мэдлэгийн сан авах эхэллээ...');
-                knowledgeBase = await getKnowledgeBase();
-                
-                // UI шинэчлэх
-                loginModal.classList.remove('active');
-                appContainer.style.display = 'flex';
-                
-                userDisplayName.textContent = currentUser.displayName;
-                
-                if (currentUser.photoURL) {
-                    userAvatar.src = currentUser.photoURL;
-                    userAvatar.style.display = 'block';
-                }
-                
-                addSystemMessage(`⚪ ${currentUser.displayName} ⚪ тавтай морил!\n\nЭнэхүү систем нь Монгол улсын хиймэл оюун ухаант төрийн системлүү чиглүүлсэн demo хувилбар юм.\nБаруун талын хөнгөвчлөх товчнуудыг ашиглаж ерөнхий мэдээллийг авна уу!`);
-                
-                // Initialize social features
-                initializeSocialFeatures();
-                
-                messageInput.focus();
-                updateStats();
-                
-                console.log('Нэвтрэлт амжилттай дууслаа');
-            } catch (error) {
-                console.error('Нэвтрэлтийн үйл явцад алдаа:', error);
-                alert('Нэвтрэлтийн үйл явцад алдаа гарлаа: ' + error.message);
+            currentUser = {
+                uid: user.uid,
+                email: user.email,
+                displayName: user.displayName || user.email.split('@')[0],
+                photoURL: user.photoURL
+            };
+            
+            isLoggedIn = true;
+            
+            // Real-time Database идэвхжүүлэх
+            setUserOnlineStatus();
+            listenToOnlineUsers();
+            listenToRooms();
+            listenToPrivateChats();
+            listenToPublicChat();
+            
+            loginModal.classList.remove('active');
+            appContainer.style.display = 'flex';
+            
+            userDisplayName.textContent = currentUser.displayName;
+            
+            if (currentUser.photoURL) {
+                userAvatar.src = currentUser.photoURL;
+                userAvatar.style.display = 'block';
             }
+            
+            addSystemMessage(`⚪ ${currentUser.displayName} ⚪ тавтай морил!\n\nЭнэхүү систем нь Монгол улсын хиймэл оюун ухаант төрийн системлүү чиглүүлсэн demo хувилбар юм.\nБаруун талын хөнгөвчлөх товчнуудыг ашиглаж ерөнхий мэдээллийг авна уу!`);
+            
+            messageInput.focus();
+            updateStats();
         }
 
         // Гарах
@@ -2162,6 +2201,7 @@
             createParticles();
             apiKeyInput.value = apiKey;
             updateStats();
+            initializeEventListeners();
         });
 
         // =============================================
@@ -2190,6 +2230,173 @@
                 
                 container.appendChild(particle);
             }
+        }
+
+        // =============================================
+        // Event Listeners Initialization
+        // =============================================
+        function initializeEventListeners() {
+            // Social Chat Event Listeners
+            joinPublicChatBtn.addEventListener('click', () => {
+                addSystemMessage('🌐 Та нийтийн чатад нэгдлээ. Бүх хэрэглэгчидтэй харилцах боломжтой.');
+            });
+            
+            createRoomBtn.addEventListener('click', () => {
+                createRoomModal.classList.add('active');
+            });
+            
+            friendsChatBtn.addEventListener('click', () => {
+                showFriendsModal();
+            });
+            
+            createRoomConfirmBtn.addEventListener('click', () => {
+                createNewRoom();
+            });
+            
+            createRoomModalBtn.addEventListener('click', () => {
+                roomsModal.classList.remove('active');
+                createRoomModal.classList.add('active');
+            });
+            
+            searchFriendBtn.addEventListener('click', () => {
+                searchFriends();
+            });
+            
+            friendSearchInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    searchFriends();
+                }
+            });
+            
+            sendPrivateMessageBtn.addEventListener('click', () => {
+                sendPrivateChatMessage();
+            });
+            
+            privateMessageInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    sendPrivateChatMessage();
+                }
+            });
+            
+            sendRoomMessageBtn.addEventListener('click', () => {
+                sendRoomChatMessage();
+            });
+            
+            roomMessageInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    sendRoomChatMessage();
+                }
+            });
+            
+            refreshSocialBtn.addEventListener('click', () => {
+                updateSocialStats();
+            });
+            
+            refreshStatsBtn.addEventListener('click', () => {
+                updateStats();
+            });
+            
+            // Basic Chat Event Listeners
+            sendButton.addEventListener('click', sendMessage);
+
+            messageInput.addEventListener('input', function() {
+                autoGrowTextarea(this);
+            });
+
+            messageInput.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter') {
+                    if (e.shiftKey) {
+                        return;
+                    } else {
+                        e.preventDefault();
+                        sendMessage();
+                    }
+                }
+            });
+
+            document.querySelectorAll('.quick-btn').forEach(button => {
+                if (button.id !== 'addKnowledgeBtn' && button.id !== 'viewKnowledgeBtn' && button.id !== 'clearChatBtn') {
+                    button.addEventListener('click', () => {
+                        messageInput.value = button.getAttribute('data-command');
+                        sendMessage();
+                    });
+                }
+            });
+
+            addKnowledgeBtn.addEventListener('click', () => {
+                knowledgeModal.classList.add('active');
+                questionInput.focus();
+            });
+
+            viewKnowledgeBtn.addEventListener('click', viewKnowledge);
+
+            clearChatBtn.addEventListener('click', () => {
+                clearChat();
+                addSystemMessage("💬 Чат цэвэрлэгдлээ! 'сайн уу' гэж бичээд эхлүүлээрэй!");
+            });
+
+            closeModal.forEach(closeBtn => {
+                closeBtn.addEventListener('click', function() {
+                    this.closest('.modal').classList.remove('active');
+                });
+            });
+
+            document.querySelector('.cancel-btn').addEventListener('click', () => {
+                knowledgeModal.classList.remove('active');
+            });
+
+            window.addEventListener('click', (e) => {
+                if (e.target === knowledgeModal) {
+                    knowledgeModal.classList.remove('active');
+                    saveKnowledgeBtn.onclick = addKnowledge;
+                }
+                if (e.target === viewKnowledgeModal) {
+                    viewKnowledgeModal.classList.remove('active');
+                }
+                if (e.target === roomsModal) {
+                    roomsModal.classList.remove('active');
+                }
+                if (e.target === createRoomModal) {
+                    createRoomModal.classList.remove('active');
+                }
+                if (e.target === friendsModal) {
+                    friendsModal.classList.remove('active');
+                }
+                if (e.target === privateChatModal) {
+                    privateChatModal.classList.remove('active');
+                }
+                if (e.target === joinRoomModal) {
+                    joinRoomModal.classList.remove('active');
+                }
+            });
+
+            saveKnowledgeBtn.addEventListener('click', addKnowledge);
+
+            closeKnowledgeModalBtn.addEventListener('click', () => {
+                viewKnowledgeModal.classList.remove('active');
+            });
+
+            saveApiKey.addEventListener('click', () => {
+                apiKey = apiKeyInput.value.trim();
+                localStorage.setItem('apiKey', apiKey);
+                addSystemMessage('✅ API Key амжилттай хадгалагдлаа!');
+            });
+
+            questionInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    answerInput.focus();
+                    e.preventDefault();
+                }
+            });
+
+            answerInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter' && e.ctrlKey) {
+                    addKnowledge();
+                    e.preventDefault();
+                }
+            });
         }
 
         // =============================================
@@ -2302,6 +2509,53 @@
             scrollToBottom();
         }
 
+        function addSocialMessage(message) {
+            const messageElement = document.createElement('div');
+            messageElement.classList.add('message', 'social-message');
+            messageElement.innerHTML = `
+                <div class="message-sender">
+                    <div class="sender-avatar">${message.displayName.charAt(0).toUpperCase()}</div>
+                    <div class="sender-name">${message.displayName}</div>
+                </div>
+                <div class="message-content">${formatMessage(message.message)}</div>
+                <div class="message-info">👥 Нийтийн чат · ${formatTimestamp(message.timestamp)}</div>
+            `;
+            chatMessages.appendChild(messageElement);
+            scrollToBottom();
+        }
+
+        function addRoomMessage(message) {
+            const messageElement = document.createElement('div');
+            messageElement.classList.add('message', 'social-message');
+            messageElement.innerHTML = `
+                <div class="message-sender">
+                    <div class="sender-avatar">${message.displayName.charAt(0).toUpperCase()}</div>
+                    <div class="sender-name">${message.displayName}</div>
+                </div>
+                <div class="message-content">${formatMessage(message.message)}</div>
+                <div class="message-info">🏠 Өрөө · ${formatTimestamp(message.timestamp)}</div>
+            `;
+            roomChatMessages.appendChild(messageElement);
+            scrollRoomToBottom();
+        }
+
+        function addPrivateMessage(message) {
+            const messageElement = document.createElement('div');
+            messageElement.classList.add('message', message.userId === currentUser.uid ? 'user-message' : 'social-message');
+            messageElement.innerHTML = `
+                ${message.userId !== currentUser.uid ? `
+                <div class="message-sender">
+                    <div class="sender-avatar">${message.displayName.charAt(0).toUpperCase()}</div>
+                    <div class="sender-name">${message.displayName}</div>
+                </div>
+                ` : ''}
+                <div class="message-content">${formatMessage(message.message)}</div>
+                <div class="message-info">${message.userId === currentUser.uid ? '👤 Та' : '👥 ' + message.displayName} · ${formatTimestamp(message.timestamp)}</div>
+            `;
+            privateChatMessages.appendChild(messageElement);
+            scrollPrivateToBottom();
+        }
+
         function typewriterEffect(element, text, speed = 20) {
             let i = 0;
             element.innerHTML = '';
@@ -2327,9 +2581,33 @@
             chatMessages.scrollTop = chatMessages.scrollHeight;
         }
 
+        function scrollRoomToBottom() {
+            roomChatMessages.scrollTop = roomChatMessages.scrollHeight;
+        }
+
+        function scrollPrivateToBottom() {
+            privateChatMessages.scrollTop = privateChatMessages.scrollHeight;
+        }
+
         function getCurrentTime() {
             const now = new Date();
             return `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
+        }
+
+        function formatTimestamp(timestamp) {
+            if (!timestamp) return getCurrentTime();
+            
+            const date = new Date(timestamp);
+            const now = new Date();
+            const diffMs = now - date;
+            const diffMins = Math.floor(diffMs / 60000);
+            const diffHours = Math.floor(diffMs / 3600000);
+            
+            if (diffMins < 1) return 'саяхан';
+            if (diffMins < 60) return `${diffMins} мин`;
+            if (diffHours < 24) return `${diffHours} цаг`;
+            
+            return `${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}`;
         }
 
         // =============================================
@@ -2420,6 +2698,11 @@
             userCountElement.textContent = isLoggedIn ? 1 : 0;
         }
 
+        function updateSocialStats() {
+            activeUsersElement.textContent = socialState.activeUsers;
+            roomCountElement.textContent = socialState.rooms.length;
+        }
+
         function clearChat() {
             chatMessages.innerHTML = '';
             messageCount = 0;
@@ -2435,10 +2718,11 @@
             const answer = answerInput.value.trim();
             
             if (question && answer) {
+                // Шинэ мэдлэг нэмэх
                 knowledgeBase[question.toLowerCase()] = answer;
                 
-                // Firestore-д хадгалах
-                await saveKnowledge(knowledgeBase);
+                // Local Storage-д хадгалах
+                localStorage.setItem('knowledgeBase', JSON.stringify(knowledgeBase));
                 
                 knowledgeModal.classList.remove('active');
                 questionInput.value = '';
@@ -2501,11 +2785,13 @@
                 const newAnswer = answerInput.value.trim();
                 
                 if (newQuestion && newAnswer) {
+                    // Хуучин мэдлэг устгах
                     delete knowledgeBase[question];
+                    // Шинэ мэдлэг нэмэх
                     knowledgeBase[newQuestion.toLowerCase()] = newAnswer;
                     
-                    // Firestore-д хадгалах
-                    await saveKnowledge(knowledgeBase);
+                    // Local Storage-д хадгалах
+                    localStorage.setItem('knowledgeBase', JSON.stringify(knowledgeBase));
                     
                     knowledgeModal.classList.remove('active');
                     questionInput.value = '';
@@ -2521,162 +2807,111 @@
         async function deleteKnowledge(question) {
             if (confirm(`"${question}" мэдлэгийг устгахдаа итгэлтэй байна уу?`)) {
                 delete knowledgeBase[question];
-                // Firestore-д хадгалах
-                await saveKnowledge(knowledgeBase);
+                // Local Storage-д хадгалах
+                localStorage.setItem('knowledgeBase', JSON.stringify(knowledgeBase));
                 viewKnowledge();
                 addSystemMessage("🗑️ Мэдлэг амжилттай устгагдлаа");
             }
         }
 
         // =============================================
-        // Social Chat Functionality
+        // Social Chat Functions
         // =============================================
 
-        // Initialize Social Features
-        function initializeSocialFeatures() {
-            loadSampleData();
-            setupSocialEventListeners();
-            updateSocialStats();
-        }
-
-        // Load Sample Data
-        function loadSampleData() {
-            // Sample rooms
-            socialState.rooms = [
-                {
-                    id: '1',
-                    name: 'Монгол Хэлний Клуб',
-                    description: 'Монгол хэлний анги',
-                    admin: currentUser?.uid,
-                    members: ['user1', 'user2'],
-                    maxMembers: 50,
-                    privacy: 'public',
-                    createdAt: new Date()
-                },
-                {
-                    id: '2', 
-                    name: 'AI Хөгжүүлэгчид',
-                    description: 'AI технологийн хөгжүүлэгчид',
-                    admin: 'user2',
-                    members: ['user2', 'user3'],
-                    maxMembers: 30,
-                    privacy: 'public',
-                    createdAt: new Date()
-                },
-                {
-                    id: '3',
-                    name: 'Гишүүдийн Өрөө',
-                    description: 'Зөвхөн урилгаар',
-                    admin: 'user3',
-                    members: ['user3'],
-                    maxMembers: 10,
-                    privacy: 'private',
-                    createdAt: new Date()
-                }
-            ];
-
-            // Sample friends
-            socialState.friends = [
-                {
-                    id: 'friend1',
-                    name: 'Бат',
-                    email: 'bat@example.com',
-                    status: 'online',
-                    lastSeen: new Date(),
-                    avatar: 'Б'
-                },
-                {
-                    id: 'friend2',
-                    name: 'Сараа',
-                    email: 'saraa@example.com',
-                    status: 'away',
-                    lastSeen: new Date(Date.now() - 300000),
-                    avatar: 'С'
-                },
-                {
-                    id: 'friend3',
-                    name: 'Тэмүүлэн',
-                    email: 'temuulen@example.com',
-                    status: 'offline',
-                    lastSeen: new Date(Date.now() - 3600000),
-                    avatar: 'Т'
-                }
-            ];
-        }
-
-        // Setup Event Listeners for Social Features
-        function setupSocialEventListeners() {
-            // Social buttons
-            joinPublicChatBtn.addEventListener('click', showRoomsModal);
-            createRoomBtn.addEventListener('click', showCreateRoomModal);
-            friendsChatBtn.addEventListener('click', showFriendsModal);
-            
-            // Modal buttons
-            createRoomModalBtn.addEventListener('click', showCreateRoomModal);
-            createRoomConfirmBtn.addEventListener('click', createNewRoom);
-            searchFriendBtn.addEventListener('click', searchFriends);
-            
-            // Full screen chat buttons
-            backToAiFromPrivate.addEventListener('click', () => {
-                privateChatFullscreen.classList.remove('active');
-                appContainer.style.display = 'flex';
-            });
-            
-            backToAiFromRoom.addEventListener('click', () => {
-                roomChatFullscreen.classList.remove('active');
-                appContainer.style.display = 'flex';
-            });
-            
-            // Full screen chat functionality
-            fullscreenSendPrivateMessageBtn.addEventListener('click', sendFullscreenPrivateMessage);
-            fullscreenSendRoomMessageBtn.addEventListener('click', sendFullscreenRoomMessage);
-            
-            // Input enter key listeners
-            fullscreenPrivateMessageInput.addEventListener('keypress', function(e) {
-                if (e.key === 'Enter' && !e.shiftKey) {
-                    e.preventDefault();
-                    sendFullscreenPrivateMessage();
-                }
-            });
-            
-            fullscreenRoomMessageInput.addEventListener('keypress', function(e) {
-                if (e.key === 'Enter' && !e.shiftKey) {
-                    e.preventDefault();
-                    sendFullscreenRoomMessage();
-                }
-            });
-            
-            // Auto-grow textareas
-            fullscreenPrivateMessageInput.addEventListener('input', function() {
-                autoGrowTextarea(this);
-            });
-            
-            fullscreenRoomMessageInput.addEventListener('input', function() {
-                autoGrowTextarea(this);
-            });
-        }
-
-        // Show Rooms Modal
-        function showRoomsModal() {
-            renderRoomsList();
-            roomsModal.classList.add('active');
-        }
-
-        // Show Create Room Modal
-        function showCreateRoomModal() {
-            roomsModal.classList.remove('active');
-            createRoomModal.classList.add('active');
-        }
-
-        // Show Friends Modal
         function showFriendsModal() {
-            renderFriendsList();
+            friendsList.innerHTML = '';
+            
+            const onlineFriends = Object.values(socialState.onlineUsers).filter(user => 
+                user.uid !== currentUser.uid
+            );
+            
+            if (onlineFriends.length === 0) {
+                friendsList.innerHTML = '<div class="empty-knowledge">Онлайн найз олдсонгүй</div>';
+            } else {
+                onlineFriends.forEach(friend => {
+                    const friendCard = document.createElement('div');
+                    friendCard.className = 'friend-card';
+                    friendCard.innerHTML = `
+                        <div class="friend-header">
+                            <div class="friend-name">${friend.displayName}</div>
+                            <div class="friend-status status-online">● онлайн</div>
+                        </div>
+                        <div class="friend-last-seen">Сүүлд идэвхтэй: ${formatTimestamp(friend.lastSeen)}</div>
+                    `;
+                    friendCard.addEventListener('click', () => {
+                        startPrivateChat(friend);
+                    });
+                    friendsList.appendChild(friendCard);
+                });
+            }
+            
             friendsModal.classList.add('active');
         }
 
-        // Render Rooms List
-        function renderRoomsList() {
+        function searchFriends() {
+            const query = friendSearchInput.value.trim();
+            if (!query) {
+                showFriendsModal();
+                return;
+            }
+            
+            const results = searchUsers(query);
+            friendsList.innerHTML = '';
+            
+            if (results.length === 0) {
+                friendsList.innerHTML = '<div class="empty-knowledge">Хэрэглэгч олдсонгүй</div>';
+            } else {
+                results.forEach(friend => {
+                    const friendCard = document.createElement('div');
+                    friendCard.className = 'friend-card';
+                    friendCard.innerHTML = `
+                        <div class="friend-header">
+                            <div class="friend-name">${friend.displayName}</div>
+                            <div class="friend-status status-online">● онлайн</div>
+                        </div>
+                        <div class="friend-last-seen">Сүүлд идэвхтэй: ${formatTimestamp(friend.lastSeen)}</div>
+                    `;
+                    friendCard.addEventListener('click', () => {
+                        startPrivateChat(friend);
+                    });
+                    friendsList.appendChild(friendCard);
+                });
+            }
+        }
+
+        function startPrivateChat(friend) {
+            const chatId = createPrivateChat(friend.uid);
+            socialState.currentPrivateChat = chatId;
+            
+            privateChatFriendName.textContent = friend.displayName;
+            privateChatAvatar.textContent = friend.displayName.charAt(0).toUpperCase();
+            privateChatStatus.textContent = 'онлайн';
+            privateChatStatus.className = 'friend-status status-online';
+            
+            privateChatMessages.innerHTML = '';
+            privateMessageInput.value = '';
+            
+            listenToPrivateChat(chatId);
+            friendsModal.classList.remove('active');
+            privateChatModal.classList.add('active');
+        }
+
+        function sendPrivateChatMessage() {
+            const message = privateMessageInput.value.trim();
+            if (!message || !socialState.currentPrivateChat) return;
+            
+            sendPrivateMessage(socialState.currentPrivateChat, message);
+            privateMessageInput.value = '';
+            autoGrowTextarea(privateMessageInput);
+        }
+
+        function updateRoomsList() {
             roomsList.innerHTML = '';
+            
+            if (socialState.rooms.length === 0) {
+                roomsList.innerHTML = '<div class="empty-knowledge">Өрөө олдсонгүй</div>';
+                return;
+            }
             
             socialState.rooms.forEach(room => {
                 const roomCard = document.createElement('div');
@@ -2684,384 +2919,82 @@
                 roomCard.innerHTML = `
                     <div class="room-header">
                         <div class="room-title">${room.name}</div>
-                        <div class="room-members">${room.members.length}/${room.maxMembers}</div>
+                        <div class="room-members">${room.memberCount} хэрэглэгч</div>
                     </div>
-                    <div class="room-description">${room.description}</div>
-                    <div class="room-admin">${room.privacy === 'public' ? '🌐 Нээлттэй' : '🔒 Хувийн'}</div>
+                    <div class="room-admin">${room.description || 'Тайлбаргүй'}</div>
                 `;
-                roomCard.addEventListener('click', () => joinRoom(room));
+                roomCard.addEventListener('click', () => {
+                    joinRoomAndOpen(room);
+                });
                 roomsList.appendChild(roomCard);
             });
         }
 
-        // Render Friends List
-        function renderFriendsList() {
-            friendsList.innerHTML = '';
+        function joinRoomAndOpen(room) {
+            joinRoom(room.id);
+            socialState.currentRoom = room.id;
             
-            socialState.friends.forEach(friend => {
-                const friendCard = document.createElement('div');
-                friendCard.className = 'friend-card';
-                friendCard.innerHTML = `
-                    <div class="friend-header">
-                        <div class="friend-name">${friend.name}</div>
-                        <div class="friend-status ${friend.status}">${getStatusText(friend.status)}</div>
-                    </div>
-                    <div class="friend-last-seen">Сүүлд орсон: ${formatLastSeen(friend.lastSeen)}</div>
-                `;
-                friendCard.addEventListener('click', () => startPrivateChat(friend));
-                friendsList.appendChild(friendCard);
-            });
+            joinRoomTitle.textContent = room.name;
+            joinRoomMemberCount.textContent = room.memberCount;
+            roomChatMessages.innerHTML = '';
+            roomMessageInput.value = '';
+            
+            listenToRoomChat(room.id);
+            roomsModal.classList.remove('active');
+            joinRoomModal.classList.add('active');
         }
 
-        // Create New Room
         function createNewRoom() {
             const name = roomNameInput.value.trim();
             const description = roomDescriptionInput.value.trim();
-            const privacy = document.getElementById('roomPrivacySelect').value;
-            const maxMembers = parseInt(document.getElementById('roomMaxMembers').value);
+            const privacy = roomPrivacySelect.value;
+            const maxMembers = parseInt(roomMaxMembers.value) || 50;
             
             if (!name) {
                 alert('Өрөөний нэрийг оруулна уу');
                 return;
             }
             
-            const newRoom = {
-                id: generateId(),
+            const roomData = {
                 name: name,
                 description: description,
-                admin: currentUser.uid,
-                members: [currentUser.uid],
-                maxMembers: maxMembers,
                 privacy: privacy,
-                createdAt: new Date()
+                maxMembers: maxMembers
             };
             
-            socialState.rooms.push(newRoom);
+            const roomId = createRoom(roomData);
             createRoomModal.classList.remove('active');
-            roomNameInput.value = '';
-            roomDescriptionInput.value = '';
-            
             addSystemMessage(`✅ "${name}" өрөө амжилттай үүслээ!`);
-            showRoomsModal();
-        }
-
-        // Join Room
-        function joinRoom(room) {
-            socialState.currentRoom = room;
-            roomsModal.classList.remove('active');
             
-            fullscreenRoomTitle.textContent = room.name;
-            fullscreenRoomMemberCount.textContent = room.members.length;
-            
-            // Clear previous messages
-            fullscreenRoomChatMessages.innerHTML = '';
-            
-            // Add welcome message
-            addFullscreenRoomSystemMessage(`Та "${room.name}" өрөөнд нэгдлээ!`);
-            
-            // Show full screen chat
-            appContainer.style.display = 'none';
-            roomChatFullscreen.classList.add('active');
-            fullscreenRoomMessageInput.focus();
-        }
-
-        // Start Private Chat
-        function startPrivateChat(friend) {
-            socialState.currentPrivateChat = friend;
-            friendsModal.classList.remove('active');
-            
-            fullscreenPrivateChatFriendName.textContent = friend.name;
-            fullscreenPrivateChatAvatar.textContent = friend.avatar;
-            fullscreenPrivateChatStatus.textContent = getStatusText(friend.status);
-            fullscreenPrivateChatStatus.className = `friend-status ${friend.status}`;
-            
-            // Clear previous messages
-            fullscreenPrivateChatMessages.innerHTML = '';
-            
-            // Add welcome message
-            addFullscreenPrivateSystemMessage(`Та ${friend.name}-тай хажуу чатад нэгдлээ`);
-            
-            // Show full screen chat
-            appContainer.style.display = 'none';
-            privateChatFullscreen.classList.add('active');
-            fullscreenPrivateMessageInput.focus();
-        }
-
-        // Send Fullscreen Private Message
-        function sendFullscreenPrivateMessage() {
-            const message = fullscreenPrivateMessageInput.value.trim();
-            if (!message || !socialState.currentPrivateChat) return;
-            
-            addFullscreenPrivateMessage(message, true);
-            fullscreenPrivateMessageInput.value = '';
-            autoGrowTextarea(fullscreenPrivateMessageInput);
-            
-            // Simulate friend response after delay
+            // Шинэ өрөөнд нэгдэх
             setTimeout(() => {
-                const responses = [
-                    "Сайн байна уу!",
-                    "Ямар сонин сайн байна?",
-                    "Баярлалаа!",
-                    "Хөгжилтэй байна шүү!",
-                    "Дараа ярилцая!"
-                ];
-                const randomResponse = responses[Math.floor(Math.random() * responses.length)];
-                addFullscreenPrivateMessage(randomResponse, false);
-            }, 1000 + Math.random() * 2000);
+                const room = socialState.rooms.find(r => r.id === roomId);
+                if (room) {
+                    joinRoomAndOpen(room);
+                }
+            }, 500);
         }
 
-        // Send Fullscreen Room Message
-        function sendFullscreenRoomMessage() {
-            const message = fullscreenRoomMessageInput.value.trim();
+        function sendRoomChatMessage() {
+            const message = roomMessageInput.value.trim();
             if (!message || !socialState.currentRoom) return;
             
-            addFullscreenRoomMessage(message, true);
-            fullscreenRoomMessageInput.value = '';
-            autoGrowTextarea(fullscreenRoomMessageInput);
-            
-            // Simulate other users responding
-            if (Math.random() > 0.7) {
-                setTimeout(() => {
-                    const users = ['Бат', 'Сараа', 'Тэмүүлэн', 'Гэрэл'];
-                    const randomUser = users[Math.floor(Math.random() * users.length)];
-                    const responses = [
-                        "Сайн саналаа!",
-                        "Надад ч гэсэн ийм санаа байсан.",
-                        "Баярлалаа хуваалцсанд!",
-                        "Би ч мөн адил бодож байна."
-                    ];
-                    const randomResponse = responses[Math.floor(Math.random() * responses.length)];
-                    addFullscreenRoomMessage(randomResponse, false, randomUser);
-                }, 2000 + Math.random() * 3000);
-            }
+            sendRoomMessage(socialState.currentRoom, message);
+            roomMessageInput.value = '';
+            autoGrowTextarea(roomMessageInput);
         }
 
-        // Add Fullscreen Private Message
-        function addFullscreenPrivateMessage(message, isOwn = false, senderName = null) {
-            const messageElement = document.createElement('div');
-            messageElement.classList.add('message', isOwn ? 'user-message' : 'social-message');
-            
-            if (!isOwn) {
-                messageElement.innerHTML = `
-                    <div class="message-sender">
-                        <div class="sender-avatar">${socialState.currentPrivateChat.avatar}</div>
-                        <div class="sender-name">${senderName || socialState.currentPrivateChat.name}</div>
-                    </div>
-                    <div class="message-content">${formatMessage(message)}</div>
-                    <div class="message-info">${getCurrentTime()}</div>
-                `;
-            } else {
-                messageElement.innerHTML = `
-                    <div class="message-content">${formatMessage(message)}</div>
-                    <div class="message-info">${getCurrentTime()}</div>
-                `;
-            }
-            
-            fullscreenPrivateChatMessages.appendChild(messageElement);
-            fullscreenPrivateChatMessages.scrollTop = fullscreenPrivateChatMessages.scrollHeight;
-        }
-
-        // Add Fullscreen Room Message
-        function addFullscreenRoomMessage(message, isOwn = false, senderName = 'Хэрэглэгч') {
-            const messageElement = document.createElement('div');
-            messageElement.classList.add('message', isOwn ? 'user-message' : 'social-message');
-            
-            if (!isOwn) {
-                messageElement.innerHTML = `
-                    <div class="message-sender">
-                        <div class="sender-avatar">${senderName.charAt(0)}</div>
-                        <div class="sender-name">${senderName}</div>
-                    </div>
-                    <div class="message-content">${formatMessage(message)}</div>
-                    <div class="message-info">${getCurrentTime()}</div>
-                `;
-            } else {
-                messageElement.innerHTML = `
-                    <div class="message-content">${formatMessage(message)}</div>
-                    <div class="message-info">${getCurrentTime()}</div>
-                `;
-            }
-            
-            fullscreenRoomChatMessages.appendChild(messageElement);
-            fullscreenRoomChatMessages.scrollTop = fullscreenRoomChatMessages.scrollHeight;
-        }
-
-        // Add System Message to Fullscreen Private Chat
-        function addFullscreenPrivateSystemMessage(message) {
-            const messageElement = document.createElement('div');
-            messageElement.classList.add('message', 'system-message');
-            messageElement.innerHTML = `
-                <div class="message-content">${formatMessage(message)}</div>
-                <div class="message-info">⚙️ Систем · ${getCurrentTime()}</div>
-            `;
-            fullscreenPrivateChatMessages.appendChild(messageElement);
-            fullscreenPrivateChatMessages.scrollTop = fullscreenPrivateChatMessages.scrollHeight;
-        }
-
-        // Add System Message to Fullscreen Room Chat
-        function addFullscreenRoomSystemMessage(message) {
-            const messageElement = document.createElement('div');
-            messageElement.classList.add('message', 'system-message');
-            messageElement.innerHTML = `
-                <div class="message-content">${formatMessage(message)}</div>
-                <div class="message-info">⚙️ Систем · ${getCurrentTime()}</div>
-            `;
-            fullscreenRoomChatMessages.appendChild(messageElement);
-            fullscreenRoomChatMessages.scrollTop = fullscreenRoomChatMessages.scrollHeight;
-        }
-
-        // Utility Functions for Social Features
-        function generateId() {
-            return Date.now().toString(36) + Math.random().toString(36).substr(2);
-        }
-
-        function getStatusText(status) {
-            const statusMap = {
-                'online': 'онлайн',
-                'offline': 'оффлайн',
-                'away': 'завгүй'
-            };
-            return statusMap[status] || status;
-        }
-
-        function formatLastSeen(date) {
-            const now = new Date();
-            const diff = now - date;
-            const minutes = Math.floor(diff / 60000);
-            const hours = Math.floor(diff / 3600000);
-            
-            if (minutes < 1) return 'саяхан';
-            if (minutes < 60) return `${minutes} мин`;
-            if (hours < 24) return `${hours} цаг`;
-            return `${Math.floor(hours / 24)} хоног`;
-        }
-
-        function searchFriends() {
-            const query = friendSearchInput.value.toLowerCase().trim();
-            if (!query) {
-                renderFriendsList();
-                return;
-            }
-            
-            const filteredFriends = socialState.friends.filter(friend => 
-                friend.name.toLowerCase().includes(query) || 
-                friend.email.toLowerCase().includes(query)
-            );
-            
-            friendsList.innerHTML = '';
-            filteredFriends.forEach(friend => {
-                const friendCard = document.createElement('div');
-                friendCard.className = 'friend-card';
-                friendCard.innerHTML = `
-                    <div class="friend-header">
-                        <div class="friend-name">${friend.name}</div>
-                        <div class="friend-status ${friend.status}">${getStatusText(friend.status)}</div>
-                    </div>
-                    <div class="friend-last-seen">Сүүлд орсон: ${formatLastSeen(friend.lastSeen)}</div>
-                `;
-                friendCard.addEventListener('click', () => startPrivateChat(friend));
-                friendsList.appendChild(friendCard);
-            });
-        }
-
-        function updateSocialStats() {
-            activeUsersElement.textContent = socialState.friends.filter(f => f.status === 'online').length;
-            roomCountElement.textContent = socialState.rooms.length;
-        }
-
-        // =============================================
-        // Event Listeners
-        // =============================================
-        sendButton.addEventListener('click', sendMessage);
-
-        messageInput.addEventListener('input', function() {
-            autoGrowTextarea(this);
-        });
-
+        // Нийтийн чатад мессеж илгээх
         messageInput.addEventListener('keydown', function(e) {
-            if (e.key === 'Enter') {
-                if (e.shiftKey) {
-                    return;
-                } else {
-                    e.preventDefault();
-                    sendMessage();
+            if (e.key === 'Enter' && !e.shiftKey && e.ctrlKey) {
+                e.preventDefault();
+                const message = messageInput.value.trim();
+                if (message) {
+                    sendPublicMessage(message);
+                    addUserMessage(message);
+                    messageInput.value = '';
+                    autoGrowTextarea(messageInput);
                 }
-            }
-        });
-
-        document.querySelectorAll('.quick-btn').forEach(button => {
-            if (button.id !== 'addKnowledgeBtn' && button.id !== 'viewKnowledgeBtn' && button.id !== 'clearChatBtn') {
-                button.addEventListener('click', () => {
-                    messageInput.value = button.getAttribute('data-command');
-                    sendMessage();
-                });
-            }
-        });
-
-        addKnowledgeBtn.addEventListener('click', () => {
-            knowledgeModal.classList.add('active');
-            questionInput.focus();
-        });
-
-        viewKnowledgeBtn.addEventListener('click', viewKnowledge);
-
-        clearChatBtn.addEventListener('click', () => {
-            clearChat();
-            addSystemMessage("💬 Чат цэвэрлэгдлээ! 'сайн уу' гэж бичээд эхлүүлээрэй!");
-        });
-
-        closeModal.forEach(closeBtn => {
-            closeBtn.addEventListener('click', function() {
-                this.closest('.modal').classList.remove('active');
-            });
-        });
-
-        cancelBtn.addEventListener('click', () => {
-            knowledgeModal.classList.remove('active');
-        });
-
-        window.addEventListener('click', (e) => {
-            if (e.target === knowledgeModal) {
-                knowledgeModal.classList.remove('active');
-                saveKnowledgeBtn.onclick = addKnowledge;
-            }
-            if (e.target === viewKnowledgeModal) {
-                viewKnowledgeModal.classList.remove('active');
-            }
-            if (e.target === roomsModal) {
-                roomsModal.classList.remove('active');
-            }
-            if (e.target === createRoomModal) {
-                createRoomModal.classList.remove('active');
-            }
-            if (e.target === friendsModal) {
-                friendsModal.classList.remove('active');
-            }
-        });
-
-        saveKnowledgeBtn.addEventListener('click', addKnowledge);
-
-        closeKnowledgeModalBtn.addEventListener('click', () => {
-            viewKnowledgeModal.classList.remove('active');
-        });
-
-        saveApiKey.addEventListener('click', () => {
-            apiKey = apiKeyInput.value.trim();
-            localStorage.setItem('apiKey', apiKey);
-            addSystemMessage('✅ API Key амжилттай хадгалагдлаа!');
-        });
-
-        questionInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') {
-                answerInput.focus();
-                e.preventDefault();
-            }
-        });
-
-        answerInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter' && e.ctrlKey) {
-                addKnowledge();
-                e.preventDefault();
             }
         });
     </script>
