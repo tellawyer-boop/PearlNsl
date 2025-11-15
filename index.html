@@ -1216,18 +1216,6 @@
             color: var(--text-muted);
         }
 
-        .status-online {
-            color: var(--success-color);
-        }
-
-        .status-offline {
-            color: var(--text-muted);
-        }
-
-        .status-away {
-            color: var(--warning-color);
-        }
-
         /* Chat Room Styles - САЙЖРУУЛСАН */
         .chat-room-header {
             display: flex;
@@ -1844,6 +1832,83 @@
         </div>
     </div>
 
+    <!-- Өрөө үүсгэх цонх -->
+    <div id="createRoomModal" class="modal">
+        <div class="modal-content glass">
+            <div class="modal-header">
+                <h2>🆕 Өрөө Үүсгэх</h2>
+                <span class="close">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="roomNameInput">Өрөөний нэр:</label>
+                    <input type="text" id="roomNameInput" placeholder="Өрөөний нэр оруулах">
+                </div>
+                <div class="form-group">
+                    <label for="roomDescriptionInput">Тайлбар:</label>
+                    <textarea id="roomDescriptionInput" placeholder="Өрөөний тайлбар" rows="3"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="roomTypeSelect">Өрөөний төрөл:</label>
+                    <select id="roomTypeSelect">
+                        <option value="public">Нийтэд нээлттэй өрөө</option>
+                        <option value="private">Цоожтой өрөө</option>
+                    </select>
+                </div>
+                <div class="form-group" id="roomPasswordGroup" style="display: none;">
+                    <label for="roomPasswordInput">Нууц үг:</label>
+                    <input type="password" id="roomPasswordInput" placeholder="Нууц үг оруулах">
+                </div>
+                <div class="form-group">
+                    <label for="roomCapacityInput">Хүний багтаамж:</label>
+                    <input type="number" id="roomCapacityInput" min="2" max="100" value="10">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="cancel-btn">Цуцлах</button>
+                <button id="createRoomConfirmBtn" class="save-btn">Үүсгэх</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Өрөөнүүдийн жагсаалт цонх -->
+    <div id="roomsListModal" class="modal">
+        <div class="modal-content glass" style="max-width: 800px;">
+            <div class="modal-header">
+                <h2>🏠 Өрөөнүүд</h2>
+                <span class="close">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div class="rooms-grid" id="roomsList">
+                    <!-- Энд өрөөнүүдийн жагсаалт харуулагдана -->
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="cancel-btn">Хаах</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Цоожтой өрөөнд нэвтрэх цонх -->
+    <div id="privateRoomAccessModal" class="modal">
+        <div class="modal-content glass">
+            <div class="modal-header">
+                <h2>🔒 Өрөөнд нэвтрэх</h2>
+                <span class="close">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="roomAccessPasswordInput">Нууц үг:</label>
+                    <input type="password" id="roomAccessPasswordInput" placeholder="Нууц үгээ оруулна уу">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="cancel-btn">Цуцлах</button>
+                <button id="joinPrivateRoomBtn" class="save-btn">Нэвтрэх</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Нийтийн өрөө цонх - САЙЖРУУЛСАН -->
     <div id="publicRoomModal" class="modal">
         <div class="modal-content glass fullscreen-modal">
@@ -2032,7 +2097,8 @@
             onlineUsers: {},
             friendRequests: [],
             customName: localStorage.getItem('customName') || '',
-            publicMessageCount: 0
+            publicMessageCount: 0,
+            availableRooms: []
         };
 
         // =============================================
@@ -2081,6 +2147,19 @@
                 addPublicMessage(message);
                 socialState.publicMessageCount++;
                 updateSocialStats();
+            });
+        }
+
+        // Өрөөнүүдийг харах
+        function listenToRooms() {
+            const roomsRef = database.ref('rooms');
+            roomsRef.on('value', (snapshot) => {
+                const rooms = snapshot.val() || {};
+                socialState.availableRooms = Object.keys(rooms).map(key => ({
+                    id: key,
+                    ...rooms[key]
+                }));
+                updateRoomCount();
             });
         }
 
@@ -2144,6 +2223,68 @@
             };
             
             database.ref('privateChats/' + chatId + '/messages').push(messageData);
+        }
+
+        // Өрөө үүсгэх
+        function createRoom(roomData) {
+            if (!currentUser) return null;
+            
+            const roomId = database.ref('rooms').push().key;
+            const roomRef = database.ref('rooms/' + roomId);
+            
+            const roomInfo = {
+                id: roomId,
+                name: roomData.name,
+                description: roomData.description,
+                type: roomData.type,
+                password: roomData.password || '',
+                capacity: roomData.capacity,
+                createdBy: currentUser.uid,
+                createdByDisplayName: socialState.customName || currentUser.displayName,
+                createdAt: firebase.database.ServerValue.TIMESTAMP,
+                members: {
+                    [currentUser.uid]: true
+                },
+                memberCount: 1
+            };
+            
+            roomRef.set(roomInfo);
+            return roomId;
+        }
+
+        // Өрөөнд нэгдэх
+        function joinRoom(roomId, password = '') {
+            if (!currentUser) return false;
+            
+            const roomRef = database.ref('rooms/' + roomId);
+            roomRef.once('value').then((snapshot) => {
+                const room = snapshot.val();
+                if (!room) {
+                    alert('Өрөө олдсонгүй');
+                    return false;
+                }
+                
+                // Цоожтой өрөөнд нууц үг шалгах
+                if (room.type === 'private' && room.password !== password) {
+                    alert('Нууц үг буруу байна');
+                    return false;
+                }
+                
+                // Багтаамж шалгах
+                if (room.memberCount >= room.capacity) {
+                    alert('Өрөө дүүрсэн байна');
+                    return false;
+                }
+                
+                // Өрөөнд нэмэх
+                roomRef.update({
+                    [`members/${currentUser.uid}`]: true,
+                    memberCount: room.memberCount + 1
+                });
+                
+                socialState.currentRoom = roomId;
+                return true;
+            });
         }
 
         // Хажуу чат үүсгэх
@@ -2270,6 +2411,21 @@
         const publicRoomMemberCount = document.getElementById('publicRoomMemberCount');
         const inviteToPublicBtn = document.getElementById('inviteToPublicBtn');
 
+        // New Room Management Elements
+        const createRoomModal = document.getElementById('createRoomModal');
+        const roomsListModal = document.getElementById('roomsListModal');
+        const privateRoomAccessModal = document.getElementById('privateRoomAccessModal');
+        const roomNameInput = document.getElementById('roomNameInput');
+        const roomDescriptionInput = document.getElementById('roomDescriptionInput');
+        const roomTypeSelect = document.getElementById('roomTypeSelect');
+        const roomPasswordGroup = document.getElementById('roomPasswordGroup');
+        const roomPasswordInput = document.getElementById('roomPasswordInput');
+        const roomCapacityInput = document.getElementById('roomCapacityInput');
+        const createRoomConfirmBtn = document.getElementById('createRoomConfirmBtn');
+        const roomsList = document.getElementById('roomsList');
+        const roomAccessPasswordInput = document.getElementById('roomAccessPasswordInput');
+        const joinPrivateRoomBtn = document.getElementById('joinPrivateRoomBtn');
+
         // =============================================
         // Firebase Authentication
         // =============================================
@@ -2321,6 +2477,7 @@
             setUserOnlineStatus();
             listenToOnlineUsers();
             listenToPublicChat();
+            listenToRooms();
             listenToFriendRequests();
             
             loginModal.classList.remove('active');
@@ -2412,6 +2569,11 @@
                 publicRoomMemberCount.textContent = socialState.activeUsers;
             });
             
+            createRoomBtn.addEventListener('click', () => {
+                createRoomModal.classList.add('active');
+                roomNameInput.focus();
+            });
+            
             friendsChatBtn.addEventListener('click', () => {
                 privateChatModal.classList.add('active');
                 loadOnlineUsersForPrivateChat();
@@ -2452,6 +2614,23 @@
                 navigator.clipboard.writeText(inviteLink).then(() => {
                     addSystemMessageToPublicChat('✅ Холбоосыг хуулав. Найзуудтайгаа хуваалцаарай!');
                 });
+            });
+            
+            // Room Management Event Listeners
+            roomTypeSelect.addEventListener('change', (e) => {
+                if (e.target.value === 'private') {
+                    roomPasswordGroup.style.display = 'flex';
+                } else {
+                    roomPasswordGroup.style.display = 'none';
+                }
+            });
+            
+            createRoomConfirmBtn.addEventListener('click', () => {
+                createNewRoom();
+            });
+            
+            joinPrivateRoomBtn.addEventListener('click', () => {
+                joinPrivateRoom();
             });
             
             // Найз нэмэх
@@ -2563,6 +2742,15 @@
                 }
                 if (e.target === friendRequestsModal) {
                     friendRequestsModal.classList.remove('active');
+                }
+                if (e.target === createRoomModal) {
+                    createRoomModal.classList.remove('active');
+                }
+                if (e.target === roomsListModal) {
+                    roomsListModal.classList.remove('active');
+                }
+                if (e.target === privateRoomAccessModal) {
+                    privateRoomAccessModal.classList.remove('active');
                 }
             });
 
@@ -2893,8 +3081,12 @@
 
         function updateSocialStats() {
             activeUsersElement.textContent = socialState.activeUsers;
-            roomCountElement.textContent = Object.keys(socialState.onlineUsers).length;
+            roomCountElement.textContent = socialState.availableRooms.length;
             publicMessageCountElement.textContent = socialState.publicMessageCount;
+        }
+
+        function updateRoomCount() {
+            roomCountElement.textContent = socialState.availableRooms.length;
         }
 
         function clearChat() {
@@ -3074,6 +3266,56 @@
             `;
             privateChatMessages.appendChild(messageElement);
             scrollPrivateToBottom();
+        }
+
+        // =============================================
+        // Room Management Functions
+        // =============================================
+
+        function createNewRoom() {
+            const roomName = roomNameInput.value.trim();
+            const roomDescription = roomDescriptionInput.value.trim();
+            const roomType = roomTypeSelect.value;
+            const roomPassword = roomPasswordInput.value;
+            const roomCapacity = parseInt(roomCapacityInput.value);
+            
+            if (!roomName) {
+                alert('Өрөөний нэрийг оруулна уу!');
+                return;
+            }
+            
+            const roomData = {
+                name: roomName,
+                description: roomDescription,
+                type: roomType,
+                password: roomPassword,
+                capacity: roomCapacity
+            };
+            
+            const roomId = createRoom(roomData);
+            if (roomId) {
+                createRoomModal.classList.remove('active');
+                addSystemMessage(`✅ "${roomName}" өрөө амжилттай үүслээ!`);
+                
+                // Form-ыг цэвэрлэх
+                roomNameInput.value = '';
+                roomDescriptionInput.value = '';
+                roomTypeSelect.value = 'public';
+                roomPasswordInput.value = '';
+                roomCapacityInput.value = '10';
+                roomPasswordGroup.style.display = 'none';
+            }
+        }
+
+        function joinPrivateRoom() {
+            const password = roomAccessPasswordInput.value;
+            const roomId = socialState.selectedRoomId;
+            
+            if (joinRoom(roomId, password)) {
+                privateRoomAccessModal.classList.remove('active');
+                roomAccessPasswordInput.value = '';
+                addSystemMessage(`✅ Өрөөнд амжилттай нэгдлээ!`);
+            }
         }
 
         function searchAndDisplayUsers(query) {
