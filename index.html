@@ -1724,12 +1724,14 @@
                             </svg>
                             Өрөө үүсгэх
                         </button>
-                        <button class="chat-btn tertiary" id="viewRoomsBtn">
+                        <button class="chat-btn tertiary" id="friendsChatBtn">
                             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M3 9L12 2L21 9V20C21 20.5304 20.7893 21.0391 20.4142 21.4142C20.0391 21.7893 19.5304 22 19 22H5C4.46957 22 3.96086 21.7893 3.58579 21.4142C3.21071 21.0391 3 20.5304 3 20V9Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                                <path d="M9 22V12H15V22" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M17 21V19C17 17.9391 16.5786 16.9217 15.8284 16.1716C15.0783 15.4214 14.0609 15 13 15H5C3.93913 15 2.92172 15.4214 2.17157 16.1716C1.42143 16.9217 1 17.9391 1 19V21" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M9 11C11.2091 11 13 9.20914 13 7C13 4.79086 11.2091 3 9 3C6.79086 3 5 4.79086 5 7C5 9.20914 6.79086 11 9 11Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M23 21V19C22.9993 18.1137 22.7044 17.2528 22.1614 16.5523C21.6184 15.8519 20.8581 15.3516 20 15.13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M16 3.13C16.8604 3.35031 17.623 3.85071 18.1676 4.55232C18.7122 5.25392 19.0078 6.11683 19.0078 7.005C19.0078 7.89318 18.7122 8.75608 18.1676 9.45769C17.623 10.1593 16.8604 10.6597 16 10.88" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                             </svg>
-                            Өрөөнүүд
+                            Хажуу чат
                         </button>
                     </div>
                 </div>
@@ -1951,6 +1953,55 @@
         </div>
     </div>
 
+    <!-- Хажуу чат цонх -->
+    <div id="privateChatModal" class="modal">
+        <div class="modal-content glass fullscreen-modal">
+            <div class="modal-header">
+                <h2>👥 Хажуу Чат</h2>
+                <div class="room-actions">
+                    <button class="theme-btn" id="backToAIFromPrivate">⬅️ AI руу буцах</button>
+                    <span class="close">&times;</span>
+                </div>
+            </div>
+            <div class="modal-body">
+                <div class="private-chat-messages" id="privateChatMessages">
+                    <!-- Хажуу чатын мессежүүд энд харуулагдана -->
+                </div>
+            </div>
+            <div class="input-container">
+                <div class="textarea-wrapper">
+                    <textarea id="privateMessageInput" placeholder="Хажуу чатад мессеж бичих..." 
+                              rows="1" autocomplete="off"></textarea>
+                </div>
+                <div class="input-actions">
+                    <button id="sendPrivateMessageBtn" class="send-btn">Илгээх</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Найз нэмэх цонх -->
+    <div id="addFriendModal" class="modal">
+        <div class="modal-content glass">
+            <div class="modal-header">
+                <h2>👥 Найз Нэмэх</h2>
+                <span class="close">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="friendSearchInput">Хэрэглэгчийн нэрээр хайх:</label>
+                    <input type="text" id="friendSearchInput" placeholder="Найзынхаа нэрийг оруулна уу">
+                </div>
+                <div class="search-results" id="friendSearchResults">
+                    <!-- Хайлтын үр дүн энд харуулагдана -->
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="cancel-btn">Хаах</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Нэр өгөх цонх -->
     <div id="customNameModal" class="modal">
         <div class="modal-content glass custom-name-modal">
@@ -1968,6 +2019,24 @@
             <div class="modal-footer">
                 <button class="cancel-btn">Цуцлах</button>
                 <button id="saveCustomNameBtn" class="save-btn">Хадгалах</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Найзын хүсэлтүүд цонх -->
+    <div id="friendRequestsModal" class="modal">
+        <div class="modal-content glass">
+            <div class="modal-header">
+                <h2>📩 Найзын Хүсэлтүүд</h2>
+                <span class="close">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div class="friend-requests-list" id="friendRequestsList">
+                    <!-- Найзын хүсэлтүүд энд харуулагдана -->
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="cancel-btn">Хаах</button>
             </div>
         </div>
     </div>
@@ -2029,8 +2098,7 @@
             friendRequests: [],
             customName: localStorage.getItem('customName') || '',
             publicMessageCount: 0,
-            availableRooms: [],
-            selectedRoomId: null
+            availableRooms: []
         };
 
         // =============================================
@@ -2095,6 +2163,32 @@
             });
         }
 
+        // Хажуу чатын мессежүүдийг харах
+        function listenToPrivateChat(chatId) {
+            if (!chatId) return;
+            
+            const privateChatRef = database.ref('privateChats/' + chatId + '/messages').limitToLast(50);
+            privateChatRef.on('child_added', (snapshot) => {
+                const message = snapshot.val();
+                addPrivateMessage(message);
+            });
+        }
+
+        // Найзын хүсэлтүүдийг харах
+        function listenToFriendRequests() {
+            if (!currentUser) return;
+            
+            const friendRequestsRef = database.ref('friendRequests').orderByChild('to').equalTo(currentUser.uid);
+            friendRequestsRef.on('value', (snapshot) => {
+                const requests = snapshot.val() || {};
+                socialState.friendRequests = Object.keys(requests).map(key => ({
+                    id: key,
+                    ...requests[key]
+                }));
+                updateFriendRequestsBadge();
+            });
+        }
+
         // =============================================
         // Social Chat Functions
         // =============================================
@@ -2113,6 +2207,22 @@
             };
             
             database.ref('publicChat').push(messageData);
+        }
+
+        // Хажуу чатад мессеж илгээх
+        function sendPrivateMessage(chatId, message) {
+            if (!currentUser || !chatId) return;
+            
+            const displayName = socialState.customName || currentUser.displayName;
+            const messageData = {
+                userId: currentUser.uid,
+                displayName: displayName,
+                message: message,
+                timestamp: firebase.database.ServerValue.TIMESTAMP,
+                type: 'private'
+            };
+            
+            database.ref('privateChats/' + chatId + '/messages').push(messageData);
         }
 
         // Өрөө үүсгэх
@@ -2177,6 +2287,62 @@
             });
         }
 
+        // Хажуу чат үүсгэх
+        function createPrivateChat(friendId) {
+            if (!currentUser) return null;
+            
+            const chatId = [currentUser.uid, friendId].sort().join('_');
+            const chatRef = database.ref('privateChats/' + chatId);
+            
+            const chatData = {
+                id: chatId,
+                participants: {
+                    [currentUser.uid]: true,
+                    [friendId]: true
+                },
+                created: firebase.database.ServerValue.TIMESTAMP,
+                lastMessage: '',
+                lastMessageTime: firebase.database.ServerValue.TIMESTAMP
+            };
+            
+            chatRef.set(chatData);
+            return chatId;
+        }
+
+        // Найзын хүсэлт илгээх
+        function sendFriendRequest(friendId) {
+            if (!currentUser) return;
+            
+            const requestId = database.ref('friendRequests').push().key;
+            const requestData = {
+                id: requestId,
+                from: currentUser.uid,
+                fromName: socialState.customName || currentUser.displayName,
+                to: friendId,
+                status: 'pending',
+                timestamp: firebase.database.ServerValue.TIMESTAMP
+            };
+            
+            database.ref('friendRequests/' + requestId).set(requestData);
+        }
+
+        // Найзын хүсэлт зөвшөөрөх
+        function acceptFriendRequest(requestId) {
+            if (!currentUser) return;
+            
+            const requestRef = database.ref('friendRequests/' + requestId);
+            requestRef.update({
+                status: 'accepted'
+            });
+        }
+
+        // Найзын хүсэлт цуцлах
+        function rejectFriendRequest(requestId) {
+            if (!currentUser) return;
+            
+            database.ref('friendRequests/' + requestId).remove();
+        }
+
         // Хэрэглэгч хайх
         function searchUsers(query) {
             return Object.values(socialState.onlineUsers).filter(user => 
@@ -2218,13 +2384,25 @@
         // Social Chat DOM Elements
         const joinPublicChatBtn = document.getElementById('joinPublicChat');
         const createRoomBtn = document.getElementById('createRoomBtn');
-        const viewRoomsBtn = document.getElementById('viewRoomsBtn');
+        const friendsChatBtn = document.getElementById('friendsChatBtn');
         const publicRoomModal = document.getElementById('publicRoomModal');
+        const privateChatModal = document.getElementById('privateChatModal');
+        const addFriendModal = document.getElementById('addFriendModal');
         const customNameModal = document.getElementById('customNameModal');
+        const friendRequestsModal = document.getElementById('friendRequestsModal');
         const publicRoomMessages = document.getElementById('publicRoomMessages');
         const publicRoomMessageInput = document.getElementById('publicRoomMessageInput');
         const sendPublicRoomMessageBtn = document.getElementById('sendPublicRoomMessageBtn');
+        const privateChatMessages = document.getElementById('privateChatMessages');
+        const privateMessageInput = document.getElementById('privateMessageInput');
+        const sendPrivateMessageBtn = document.getElementById('sendPrivateMessageBtn');
+        const friendSearchInput = document.getElementById('friendSearchInput');
+        const friendSearchResults = document.getElementById('friendSearchResults');
+        const customNameInput = document.getElementById('customNameInput');
+        const saveCustomNameBtn = document.getElementById('saveCustomNameBtn');
+        const friendRequestsList = document.getElementById('friendRequestsList');
         const backToAIFromPublic = document.getElementById('backToAIFromPublic');
+        const backToAIFromPrivate = document.getElementById('backToAIFromPrivate');
         const activeUsersElement = document.getElementById('activeUsers');
         const roomCountElement = document.getElementById('roomCount');
         const publicMessageCountElement = document.getElementById('publicMessageCount');
@@ -2247,10 +2425,6 @@
         const roomsList = document.getElementById('roomsList');
         const roomAccessPasswordInput = document.getElementById('roomAccessPasswordInput');
         const joinPrivateRoomBtn = document.getElementById('joinPrivateRoomBtn');
-
-        // Custom Name Elements
-        const customNameInput = document.getElementById('customNameInput');
-        const saveCustomNameBtn = document.getElementById('saveCustomNameBtn');
 
         // =============================================
         // Firebase Authentication
@@ -2304,6 +2478,7 @@
             listenToOnlineUsers();
             listenToPublicChat();
             listenToRooms();
+            listenToFriendRequests();
             
             loginModal.classList.remove('active');
             appContainer.style.display = 'flex';
@@ -2399,9 +2574,9 @@
                 roomNameInput.focus();
             });
             
-            viewRoomsBtn.addEventListener('click', () => {
-                displayRooms();
-                roomsListModal.classList.add('active');
+            friendsChatBtn.addEventListener('click', () => {
+                privateChatModal.classList.add('active');
+                loadOnlineUsersForPrivateChat();
             });
             
             sendPublicRoomMessageBtn.addEventListener('click', () => {
@@ -2415,8 +2590,23 @@
                 }
             });
             
+            sendPrivateMessageBtn.addEventListener('click', () => {
+                sendPrivateChatMessage();
+            });
+            
+            privateMessageInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    sendPrivateChatMessage();
+                }
+            });
+            
             backToAIFromPublic.addEventListener('click', () => {
                 publicRoomModal.classList.remove('active');
+            });
+            
+            backToAIFromPrivate.addEventListener('click', () => {
+                privateChatModal.classList.remove('active');
             });
             
             inviteToPublicBtn.addEventListener('click', () => {
@@ -2441,6 +2631,11 @@
             
             joinPrivateRoomBtn.addEventListener('click', () => {
                 joinPrivateRoom();
+            });
+            
+            // Найз нэмэх
+            friendSearchInput.addEventListener('input', (e) => {
+                searchAndDisplayUsers(e.target.value);
             });
             
             // Нэр өгөх
@@ -2536,8 +2731,17 @@
                 if (e.target === publicRoomModal) {
                     publicRoomModal.classList.remove('active');
                 }
+                if (e.target === privateChatModal) {
+                    privateChatModal.classList.remove('active');
+                }
+                if (e.target === addFriendModal) {
+                    addFriendModal.classList.remove('active');
+                }
                 if (e.target === customNameModal) {
                     customNameModal.classList.remove('active');
+                }
+                if (e.target === friendRequestsModal) {
+                    friendRequestsModal.classList.remove('active');
                 }
                 if (e.target === createRoomModal) {
                     createRoomModal.classList.remove('active');
@@ -2705,6 +2909,24 @@
             scrollPublicToBottom();
         }
 
+        function addPrivateMessage(message) {
+            const messageElement = document.createElement('div');
+            const isOwnMessage = message.userId === currentUser.uid;
+            messageElement.classList.add('private-message', isOwnMessage ? 'own' : 'other');
+            messageElement.innerHTML = `
+                ${!isOwnMessage ? `
+                <div class="message-sender">
+                    <div class="sender-avatar">${message.displayName.charAt(0).toUpperCase()}</div>
+                    <div class="sender-name">${message.displayName}</div>
+                </div>
+                ` : ''}
+                <div class="message-content">${formatMessage(message.message)}</div>
+                <div class="message-info">${isOwnMessage ? '👤 Та' : '👥 ' + message.displayName} · ${formatTimestamp(message.timestamp)}</div>
+            `;
+            privateChatMessages.appendChild(messageElement);
+            scrollPrivateToBottom();
+        }
+
         function addSystemMessageToPublicChat(message) {
             const messageElement = document.createElement('div');
             messageElement.classList.add('system-message');
@@ -2742,6 +2964,10 @@
 
         function scrollPublicToBottom() {
             publicRoomMessages.scrollTop = publicRoomMessages.scrollHeight;
+        }
+
+        function scrollPrivateToBottom() {
+            privateChatMessages.scrollTop = privateChatMessages.scrollHeight;
         }
 
         function getCurrentTime() {
@@ -2987,6 +3213,61 @@
             autoGrowTextarea(publicRoomMessageInput);
         }
 
+        function sendPrivateChatMessage() {
+            const message = privateMessageInput.value.trim();
+            if (!message || !socialState.currentPrivateChat) return;
+            
+            sendPrivateMessage(socialState.currentPrivateChat, message);
+            privateMessageInput.value = '';
+            autoGrowTextarea(privateMessageInput);
+        }
+
+        function loadOnlineUsersForPrivateChat() {
+            privateChatMessages.innerHTML = '<div class="system-message">👆 Дээрх хэрэглэгч дээр дарж чат эхлүүлнэ үү</div>';
+            
+            const onlineUsers = Object.values(socialState.onlineUsers).filter(user => 
+                user.uid !== currentUser.uid
+            );
+            
+            onlineUsers.forEach(user => {
+                const userElement = document.createElement('div');
+                userElement.className = 'friend-card';
+                userElement.innerHTML = `
+                    <div class="friend-header">
+                        <div class="friend-name">${user.displayName}</div>
+                        <div class="friend-status status-online">● онлайн</div>
+                    </div>
+                    <div class="friend-last-seen">Сүүлд идэвхтэй: ${formatTimestamp(user.lastSeen)}</div>
+                `;
+                userElement.addEventListener('click', () => {
+                    startPrivateChat(user);
+                });
+                privateChatMessages.appendChild(userElement);
+            });
+        }
+
+        function startPrivateChat(friend) {
+            const chatId = createPrivateChat(friend.uid);
+            socialState.currentPrivateChat = chatId;
+            
+            privateChatMessages.innerHTML = '';
+            privateMessageInput.value = '';
+            
+            listenToPrivateChat(chatId);
+            
+            addSystemMessageToPrivateChat(`💬 Та ${friend.displayName}-тай чат эхлүүллээ`);
+        }
+
+        function addSystemMessageToPrivateChat(message) {
+            const messageElement = document.createElement('div');
+            messageElement.classList.add('system-message');
+            messageElement.innerHTML = `
+                <div class="message-content">${formatMessage(message)}</div>
+            `;
+            privateChatMessages.appendChild(messageElement);
+            scrollPrivateToBottom();
+        }
+
         // =============================================
         // Room Management Functions
         // =============================================
@@ -3037,43 +3318,44 @@
             }
         }
 
-        function displayRooms() {
-            roomsList.innerHTML = '';
+        function searchAndDisplayUsers(query) {
+            friendSearchResults.innerHTML = '';
             
-            if (socialState.availableRooms.length === 0) {
-                roomsList.innerHTML = '<div class="empty-knowledge">Одоогоор өрөө байхгүй байна</div>';
+            if (!query.trim()) {
+                friendSearchResults.innerHTML = '<div class="empty-knowledge">Хайлтын үр дүн харуулах</div>';
                 return;
             }
             
-            socialState.availableRooms.forEach(room => {
-                const roomCard = document.createElement('div');
-                roomCard.className = 'room-card';
-                roomCard.innerHTML = `
-                    <div class="room-header">
-                        <div class="room-title">${room.name}</div>
-                        <div class="room-members">${room.memberCount}/${room.capacity} хүн</div>
+            const results = searchUsers(query);
+            
+            if (results.length === 0) {
+                friendSearchResults.innerHTML = '<div class="empty-knowledge">Хэрэглэгч олдсонгүй</div>';
+                return;
+            }
+            
+            results.forEach(user => {
+                const userElement = document.createElement('div');
+                userElement.className = 'friend-card';
+                userElement.innerHTML = `
+                    <div class="friend-header">
+                        <div class="friend-name">${user.displayName}</div>
+                        <div class="friend-status status-online">● онлайн</div>
                     </div>
-                    <div class="room-description">${room.description || 'Тайлбар байхгүй'}</div>
-                    <div class="room-admin">Админ: ${room.createdByDisplayName}</div>
-                    <div class="room-type">${room.type === 'public' ? '🌐 Нийтийн' : '🔒 Хувийн'}</div>
+                    <div class="friend-request-actions">
+                        <button class="accept-btn add-friend-btn" data-uid="${user.uid}">Найз нэмэх</button>
+                    </div>
                 `;
-                
-                roomCard.addEventListener('click', () => {
-                    if (room.type === 'private') {
-                        // Цоожтой өрөөнд нэвтрэх цонх харуулах
-                        socialState.selectedRoomId = room.id;
-                        privateRoomAccessModal.classList.add('active');
-                        roomsListModal.classList.remove('active');
-                    } else {
-                        // Нийтийн өрөөнд шууд нэгдэх
-                        if (joinRoom(room.id)) {
-                            roomsListModal.classList.remove('active');
-                            publicRoomModal.classList.add('active');
-                        }
-                    }
+                friendSearchResults.appendChild(userElement);
+            });
+            
+            // Найз нэмэх товчлууруудад event listener нэмэх
+            document.querySelectorAll('.add-friend-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const friendId = this.getAttribute('data-uid');
+                    sendFriendRequest(friendId);
+                    addSystemMessage('✅ Найзын хүсэлт илгээгдлээ!');
+                    addFriendModal.classList.remove('active');
                 });
-                
-                roomsList.appendChild(roomCard);
             });
         }
 
@@ -3097,6 +3379,11 @@
             
             customNameModal.classList.remove('active');
             addSystemMessage(`✅ Таны нэр "${customName}" болж өөрчлөгдлөө!`);
+        }
+
+        function updateFriendRequestsBadge() {
+            const pendingRequests = socialState.friendRequests.filter(req => req.status === 'pending');
+            // Баджийг шинэчлэх логик энд нэмнэ
         }
     </script>
 </body>
